@@ -29,7 +29,7 @@ void setup() {
   Serial.println("After setting up the scale:");
 
   Serial.print("read: \t\t");
-  Serial.println(scale.read());                 // print a waw reading from the ADC
+  Serial.println(scale.read());                 // print a raw reading from the ADC
 
   Serial.print("read average: \t\t");
   Serial.println(scale.read_average(20));       // print the average of 20 readings from the ADC
