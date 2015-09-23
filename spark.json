@@ -1,0 +1,7 @@
+{
+    "name": "HX711 24-Bit ADC",
+    "version": "0.0.1",
+    "author": "Bogde <https://github.com/bogde>",
+    "license": "LGPL",
+    "description": "Library to interface the Avia Semiconductor HX711 24-Bit Analog-to-Digital Converter (ADC) for Weight Scales"
+}
