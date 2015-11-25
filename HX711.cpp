@@ -43,13 +43,9 @@ long HX711::read() {
 	byte data[3];
 
 	// pulse the clock pin 24 times to read the data
-	for (byte j = 3; j--;) {
-		for (char i = 8; i--;) {
-			digitalWrite(PD_SCK, HIGH);
-			bitWrite(data[j], i, digitalRead(DOUT));
-			digitalWrite(PD_SCK, LOW);
-		}
-	}
+    data[2] = shiftIn(DOUT, PD_SCK, MSBFIRST);
+    data[1] = shiftIn(DOUT, PD_SCK, MSBFIRST);
+    data[0] = shiftIn(DOUT, PD_SCK, MSBFIRST);
 
 	// set the channel and the gain factor for the next reading using the clock pin
 	for (int i = 0; i < GAIN; i++) {
