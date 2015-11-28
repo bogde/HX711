@@ -64,6 +64,8 @@ long HX711::read() {
     // Replicate the most significant bit to pad out a 32-bit signed integer
     if ( data[2] & 0x80 ) {
         filler = 0xFF;
+    } else if ((0x7F == data[2]) && (0xFF == data[1]) && (0xFF == data[0])) {
+        filler = 0xFF;
     } else {
         filler = 0x00;
     }
