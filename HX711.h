@@ -53,8 +53,14 @@ class HX711
 		// set the SCALE value; this value is used to convert the raw data to "human readable" data (measure units)
 		void set_scale(float scale = 1.f);
 
+		// get the current SCALE
+		float get_scale();
+
 		// set OFFSET, the value that's subtracted from the actual reading (tare weight)
 		void set_offset(long offset = 0);
+
+		// get the current OFFSET
+		long get_offset();
 
 		// puts the chip into power down mode
 		void power_down();
