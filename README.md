@@ -9,6 +9,7 @@ http://www.dfrobot.com/image/data/SEN0160/hx711_english.pdf
 Other libraries exist, including this very good one, which I first used and which is the starting point for my library:
 https://github.com/aguegu/ardulibs/tree/master/hx711
 
+# Advantages of this library
 Although other libraries exist, I needed a slightly different approach, so here's how my library is different than others:
 
 1. It provides a tare() function, which "resets" the scale to 0. Many other implementations calculate the tare weight when the ADC is initialized only. I needed a way to be able to set the tare weight at any time. Use case: place an empty container on the scale, call tare() to reset the readings to 0, fill the container and get the weight of the content.
@@ -21,10 +22,13 @@ Although other libraries exist, I needed a slightly different approach, so here'
 
 5. The "get_value" and "get_units" functions can receive an extra parameter "times", and they will return the average of multiple readings instead of a single reading.
 
-How to Calibrate Your Scale
+# How to Calibrate Your Scale
 
 1. Call set_scale() with no parameter.
 2. Call tare() with no parameter.
 3. Place a known weight on the scale and call get_units(10).
 4. Divide the result in step 3 to your known weight. You should get about the parameter you need to pass to set_scale.
 5. Adjust the parameter in step 4 until you get an accurate reading.
+
+# How to use
+See the examples section for possible implementations with the different constructors
