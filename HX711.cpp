@@ -2,17 +2,24 @@
 #include <HX711.h>
 
 HX711::HX711(byte dout, byte pd_sck, byte gain) {
-	PD_SCK 	= pd_sck;
-	DOUT 	= dout;
+	begin(dout, pd_sck, gain);
+}
+
+HX711::HX711() {
+}
+
+HX711::~HX711() {
+
+}
+
+void HX711::begin(byte dout, byte pd_sck, byte gain) {
+	PD_SCK = pd_sck;
+	DOUT   = dout;
 
 	pinMode(PD_SCK, OUTPUT);
 	pinMode(DOUT, INPUT);
 
 	set_gain(gain);
-}
-
-HX711::~HX711() {
-
 }
 
 bool HX711::is_ready() {
@@ -38,7 +45,10 @@ void HX711::set_gain(byte gain) {
 
 long HX711::read() {
 	// wait for the chip to become ready
-	while (!is_ready());
+	while (!is_ready()) {
+		// Will do nothing on Arduino but prevent resets of ESP8266 (Watchdog Issue)
+		yield();
+	}
 
     unsigned long value = 0;
     byte data[3] = { 0 };
@@ -84,6 +94,7 @@ long HX711::read_average(byte times) {
 	long sum = 0;
 	for (byte i = 0; i < times; i++) {
 		sum += read();
+		yield();
 	}
 	return sum / times;
 }
