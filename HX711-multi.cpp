@@ -11,10 +11,16 @@ HX711MULTI::HX711MULTI(int count, byte *dout, byte pd_sck, byte gain) {
 		pinMode(DOUT[i], INPUT);
 	}
 	set_gain(gain);
+
+	OFFSETS = (long *) malloc(COUNT*sizeof(long));
+
+	for (int i=0; i<COUNT; ++i) {
+		OFFSETS[i] = 0;
+	}
 }
 
 HX711MULTI::~HX711MULTI() {
-
+	free(OFFSETS);
 }
 
 bool HX711MULTI::is_ready() { 
@@ -49,6 +55,60 @@ byte HX711MULTI::get_count() {
 	return COUNT;
 }
 
+//TODO: write a function / state variable that 'learns' (stores/tracks) the expected noise figure from the cells, and automatically selects a reasonable 'tolerance' for tare.
+//		i.e. a 'best recently seen stability'. Keep it up-to-date automatically by updating it with every read. (reads will probably need to be time-aware)
+
+bool HX711MULTI::tare(byte times, uint16_t tolerance) {
+	//TODO: change this implementation to use a smarter read strategy. 
+	//		right now samples are read 'times' times, but only the last is used (the multiple samples)
+	//		are just being used to verify the spread is < tolerance.
+	//		
+	//		This should be done by creating a smarter multiple-reads function which returns a struct with values and metadata (number of good samples, standard deviation, etc.) 
+	int i,j;
+
+	long values[COUNT];
+
+	long minValues[COUNT];
+	long maxValues[COUNT];
+
+	for (i=0; i<COUNT; ++i) {
+		minValues[i]=0x7FFFFFFF;
+		maxValues[i]=0x80000000;
+
+		OFFSETS[i]=0;
+	}
+
+	for (i=0; i<times; ++i) {
+		read(values);
+		for (j=0; j<COUNT; ++j) {
+			if (values[j]<minValues[j]) {
+				minValues[j]=values[j];
+			}	
+			if (values[j]>maxValues[j]) {
+				maxValues[j]=values[j];
+			} 
+		}		
+	}
+
+	if (tolerance!=0 && times>1) {
+		for (i=0; i<COUNT; ++i) {
+			if (abs(maxValues[i]-minValues[i])>tolerance) {
+				//one of the cells fluctuated more than the allowed tolerance, reject tare attempt;
+				Serial.println("Rejecting tare");
+				Serial.println(abs(maxValues[i]-minValues[i]));
+				return false;
+			}
+		}
+	}
+
+	//set the offsets
+	for (i=0; i<COUNT; ++i) {
+		OFFSETS[i] = values[i];
+	}
+	return true;
+
+}
+
 //reads from all cahnnels and sets the values into the passed long array pointer (which must have at least 'count' cells allocated)
 //send NULL if you are only reading to toggle the line, and not to get values, such as in the case of setting gains.
 void HX711MULTI::read(long *result) {
@@ -75,13 +135,15 @@ void HX711MULTI::read(long *result) {
 
     // Datasheet indicates the value is returned as a two's complement value, so 'stretch' the 24th bit to fit into 32 bits. 
     if (NULL!=result) {
-	    for (int j = 0; j < COUNT; ++j) {
+	    for (j = 0; j < COUNT; ++j) {
 	    	if ( ( result[j] & 0x00800000 ) ) {
 	    		result[j] |= 0xFF000000;
 	    	} else {
 	    		result[j] &= 0x00FFFFFF; //required in lieu of re-setting the value to zero before shifting bits in.
 	    	}
-	    }    	
+		    result[j] -= OFFSETS[j];   	
+	    } 
+
     }
 }
 

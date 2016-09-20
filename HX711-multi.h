@@ -14,7 +14,8 @@ class HX711MULTI
 		byte COUNT;		// The number of channels to read
 		byte *DOUT;		// Serial Data Output Pin
 		byte GAIN;		// amplification factor
-		long OFFSET;	// used for tare weight
+
+		long *OFFSETS;	// used for tare weight
 		float SCALE;	// used to return weight in grams, kg, ounces, whatever
 
 	public:
@@ -41,6 +42,12 @@ class HX711MULTI
 
 		// waits for the chip to be ready and returns a reading
 		void read(long *result = NULL);
+
+		// set the OFFSET value for tare weight
+		// times: how many times to read the tare value
+		// returns true iff the offsets have been reset for the scale during this call.
+		// tolerance: the maximum deviation of samples, above which to reject the attempt to tare. (if set to 0, ignored)
+		bool tare(byte times = 10, uint16_t tolerance = 0);
 
 		// puts the chip into power down mode
 		void power_down();
