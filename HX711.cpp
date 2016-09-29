@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <HX711.h>
+#include "HX711.h"
 
 HX711::HX711(byte dout, byte pd_sck, byte gain) {
 	begin(dout, pd_sck, gain);
@@ -44,50 +44,48 @@ void HX711::set_gain(byte gain) {
 }
 
 long HX711::read() {
-	// wait for the chip to become ready
-	while (!is_ready()) {
-		// Will do nothing on Arduino but prevent resets of ESP8266 (Watchdog Issue)
-		yield();
-	}
+    // Byte:     0        1        2        3
+    // Bits:  76543210 76543210 76543210 76543210
+    // Data: |--------|--------|--------|--------|
+    // Bit#:  33222222 22221111 11111100 00000000
+    //        10987654 32109876 54321098 76543210
+    union DataBuffer {
+        byte data[4];
+        long value;
+    } data_buffer;
 
-    unsigned long value = 0;
-    byte data[3] = { 0 };
-    byte filler = 0x00;
+    // Wait for the chip to become ready
+    for (; !is_ready() ;) {
+        // Will do nothing on Arduino but prevent resets of ESP8266 (Watchdog Issue)
+        yield();
+    }
 
-	// pulse the clock pin 24 times to read the data
-    data[2] = shiftIn(DOUT, PD_SCK, MSBFIRST);
-    data[1] = shiftIn(DOUT, PD_SCK, MSBFIRST);
-    data[0] = shiftIn(DOUT, PD_SCK, MSBFIRST);
+    // Pulse the clock pin 24 times to read the data
+    data_buffer.data[1] = shiftIn(DOUT, PD_SCK, MSBFIRST);
+    data_buffer.data[2] = shiftIn(DOUT, PD_SCK, MSBFIRST);
+    data_buffer.data[3] = shiftIn(DOUT, PD_SCK, MSBFIRST);
 
-	// set the channel and the gain factor for the next reading using the clock pin
-	for (unsigned int i = 0; i < GAIN; i++) {
+	// Set the channel and the gain factor for the next reading using the clock pin
+	for (unsigned int i = GAIN ; 0 < i ; --i) {
 		digitalWrite(PD_SCK, HIGH);
 		digitalWrite(PD_SCK, LOW);
 	}
 
-    // Datasheet indicates the value is returned as a two's complement value
-    // Flip all the bits
-    data[2] = ~data[2];
-    data[1] = ~data[1];
-    data[0] = ~data[0];
-
     // Replicate the most significant bit to pad out a 32-bit signed integer
-    if ( data[2] & 0x80 ) {
-        filler = 0xFF;
-    } else if ((0x7F == data[2]) && (0xFF == data[1]) && (0xFF == data[0])) {
-        filler = 0xFF;
+    if ( data_buffer.data[1] & 0x80 ) {
+        data_buffer.data[0] = 0xFF;
     } else {
-        filler = 0x00;
+        data_buffer.data[0] = 0x00;
     }
 
-    // Construct a 32-bit signed integer
-    value = ( static_cast<unsigned long>(filler) << 24
-            | static_cast<unsigned long>(data[2]) << 16
-            | static_cast<unsigned long>(data[1]) << 8
-            | static_cast<unsigned long>(data[0]) );
+    // Datasheet indicates the value is a 24-bit two's complement (signed) value
+    // https://cdn.sparkfun.com/datasheets/Sensors/ForceFlex/hx711_english.pdf
+
+    // Flip all the bits
+    data_buffer.value = ~data_buffer.value;
 
     // ... and add 1
-    return static_cast<long>(++value);
+    return ++data_buffer.value;
 }
 
 long HX711::read_average(byte times) {
