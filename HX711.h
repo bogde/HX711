@@ -1,7 +1,7 @@
 #ifndef HX711_h
 #define HX711_h
 
-#if defined(ARDUINO) && (ARDUINO >= 100)
+#if ARDUINO >= 100
 #include "Arduino.h"
 #else
 #include "WProgram.h"
