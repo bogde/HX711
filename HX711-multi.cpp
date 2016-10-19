@@ -6,6 +6,8 @@ HX711MULTI::HX711MULTI(int count, byte *dout, byte pd_sck, byte gain) {
 	DOUT 	= dout; //TODO - make the input of dout to the function a const, or otherwise copy the values for local storage
 	COUNT   = count;
 
+	debugEnabled = false;
+
 	pinMode(PD_SCK, OUTPUT);
 	for (int i=0; i<count; i++) {
 		pinMode(DOUT[i], INPUT);
@@ -75,11 +77,11 @@ bool HX711MULTI::tare(byte times, uint16_t tolerance) {
 		minValues[i]=0x7FFFFFFF;
 		maxValues[i]=0x80000000;
 
-		OFFSETS[i]=0;
+		//OFFSETS[i]=0; //<--removed this line, so that a failed tare does not undo previous tare
 	}
 
 	for (i=0; i<times; ++i) {
-		read(values);
+		readRaw(values);
 		for (j=0; j<COUNT; ++j) {
 			if (values[j]<minValues[j]) {
 				minValues[j]=values[j];
@@ -94,8 +96,12 @@ bool HX711MULTI::tare(byte times, uint16_t tolerance) {
 		for (i=0; i<COUNT; ++i) {
 			if (abs(maxValues[i]-minValues[i])>tolerance) {
 				//one of the cells fluctuated more than the allowed tolerance, reject tare attempt;
-				Serial.println("Rejecting tare");
-				Serial.println(abs(maxValues[i]-minValues[i]));
+				if (debugEnabled) {
+					Serial.print("Rejecting tare: (");
+					Serial.print(i);
+					Serial.print(") ");
+					Serial.println(abs(maxValues[i]-minValues[i]));
+				}
 				return false;
 			}
 		}
@@ -110,8 +116,21 @@ bool HX711MULTI::tare(byte times, uint16_t tolerance) {
 }
 
 //reads from all cahnnels and sets the values into the passed long array pointer (which must have at least 'count' cells allocated)
-//send NULL if you are only reading to toggle the line, and not to get values, such as in the case of setting gains.
+//if you are only reading to toggle the line, and not to get values (such as in the case of setting gains) you can pass NULL.
 void HX711MULTI::read(long *result) {
+    
+    readRaw(result);
+    
+    // Datasheet indicates the value is returned as a two's complement value, so 'stretch' the 24th bit to fit into 32 bits. 
+	if (NULL!=result) {
+		for (int j = 0; j < COUNT; ++j) {
+		    result[j] -= OFFSETS[j];   	
+		}
+	}
+}
+
+
+void HX711MULTI::readRaw(long *result) {
 	int i,j;
 	// wait for all the chips to become ready
 	while (!is_ready());
@@ -141,10 +160,13 @@ void HX711MULTI::read(long *result) {
 	    	} else {
 	    		result[j] &= 0x00FFFFFF; //required in lieu of re-setting the value to zero before shifting bits in.
 	    	}
-		    result[j] -= OFFSETS[j];   	
 	    } 
 
     }
+}
+
+void HX711MULTI::setDebugEnable(bool debugEnable) {
+	debugEnabled = debugEnable;
 }
 
 void HX711MULTI::power_down() {

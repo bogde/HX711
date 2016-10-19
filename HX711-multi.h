@@ -15,6 +15,8 @@ class HX711MULTI
 		byte *DOUT;		// Serial Data Output Pin
 		byte GAIN;		// amplification factor
 
+		bool debugEnabled; //print debug messages?
+
 		long *OFFSETS;	// used for tare weight
 		float SCALE;	// used to return weight in grams, kg, ounces, whatever
 
@@ -43,6 +45,9 @@ class HX711MULTI
 		// waits for the chip to be ready and returns a reading
 		void read(long *result = NULL);
 
+		// same as read, but does not offset the values according to the tare
+		void HX711MULTI::readRaw(long *result = NULL);
+
 		// set the OFFSET value for tare weight
 		// times: how many times to read the tare value
 		// returns true iff the offsets have been reset for the scale during this call.
@@ -54,6 +59,8 @@ class HX711MULTI
 
 		// wakes up the chip after power down mode
 		void power_up();
+
+		void setDebugEnable(bool debugEnable = true);
 };
 
 #endif /* HX711_MULTI_h */
