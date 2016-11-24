@@ -31,4 +31,5 @@ Although other libraries exist, I needed a slightly different approach, so here'
 5. Adjust the parameter in step 4 until you get an accurate reading.
 
 # How to use
-See the examples section for possible implementations with the different constructors
+See the example in examples/HX711SerialBegin. Please don't use examples/HX711Serial anymore. It is deprecated because the pin definition within the constructor
+is not timing safe. (#29)
