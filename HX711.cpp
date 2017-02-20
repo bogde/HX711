@@ -9,6 +9,10 @@
 **/
 #include <Arduino.h>
 #include <HX711.h>
+#ifdef AVR
+// Acquire AVR-specific ATOMIC_BLOCK(ATOMIC_RESTORESTATE) macro
+#include <util/atomic.h>
+#endif
 
 #if defined(ARDUINO) && ARDUINO <= 106
 	// "yield" is not implemented as noop in older Arduino Core releases, so let's define it.
@@ -90,6 +94,23 @@ long HX711::read() {
 	uint8_t data[3] = { 0 };
 	uint8_t filler = 0x00;
 
+	// Protect the read sequence from system interrupts.  If an interrupt occurs during
+	// the time the PD_SCK signal is high it will stretch the length of the clock pulse.
+	// If the total pulse time exceeds 60 uSec this will cause the HX711 to enter
+	// power down mode during the middle of the read sequence.  While the device will
+	// wake up when PD_SCK goes low again, the reset starts a new conversion cycle which
+	// forces DOUT high until that cycle is completed.
+	//
+	// The result is that all subsequent bits read by shiftIn() will read back as 1,
+	// corrupting the value returned by read().  The ATOMIC_BLOCK macro disables
+	// interrupts during the sequence and then restores the interrupt mask to its previous
+	// state after the sequence completes, insuring that the entire read-and-gain-set
+	// sequence is not interrupted.  The macro has a few minor advantages over bracketing
+	// the sequence between NoInterrupts() and interrupts() calls.
+	#ifdef AVR
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+	#endif
+
 	#ifdef ESP_H
 	// Begin of critical section.
 	// Critical sections are used as a valid protection method
@@ -120,6 +141,10 @@ long HX711::read() {
 	#ifdef ESP_H
 	// End of critical section.
 	portEXIT_CRITICAL(&mux);
+	#endif
+
+	#ifdef AVR
+	}
 	#endif
 
 	// Replicate the most significant bit to pad out a 32-bit signed integer
