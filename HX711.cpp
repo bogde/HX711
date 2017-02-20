@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <util/atomic.h>	// For ATOMIC_BLOCK(ATOMIC_RESTORESTATE) macro
 #include <HX711.h>
 
 #if ARDUINO_VERSION <= 106
@@ -59,17 +60,34 @@ long HX711::read() {
 	uint8_t data[3] = { 0 };
 	uint8_t filler = 0x00;
 
-	// pulse the clock pin 24 times to read the data
-	data[2] = shiftIn(DOUT, PD_SCK, MSBFIRST);
-	data[1] = shiftIn(DOUT, PD_SCK, MSBFIRST);
-	data[0] = shiftIn(DOUT, PD_SCK, MSBFIRST);
+        // Protect the read sequence from system interrupts.  If an interrupt occurs during
+        // the time the PD_SCK signal is high it will stretch the length of the clock pulse.
+        // If the total pulse time exceeds 60 uSec this will cause the HX711 to enter 
+        // power down mode during the middle of the read sequence.  While the device will
+        // wake up when PD_SCK goes low again, the reset starts a new conversion cycle which
+        // forces DOUT high until that cycle is completed.
+        //
+        // The result is that all subsequent bits read by shiftIn() will read back as 1, 
+        // corrupting the value returned by read().  The ATOMIC_BLOCK macro disables
+        // interrupts during the sequence and then restores the interrupt mask to its previous
+        // state after the sequence completes, insuring that the entire read-and-gain-set
+        // sequence is not interrupted.  The macro has a few minor advantages over bracketing
+        // the sequence between NoInterrupts() and interrupts() calls.
 
-	// set the channel and the gain factor for the next reading using the clock pin
-	for (unsigned int i = 0; i < GAIN; i++) {
-		digitalWrite(PD_SCK, HIGH);
-		digitalWrite(PD_SCK, LOW);
-	}
+        ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
 
+	  // pulse the clock pin 24 times to read the data
+	  data[2] = shiftIn(DOUT, PD_SCK, MSBFIRST);
+	  data[1] = shiftIn(DOUT, PD_SCK, MSBFIRST);
+	  data[0] = shiftIn(DOUT, PD_SCK, MSBFIRST);
+
+	  // set the channel and the gain factor for the next reading using the clock pin
+	  for (unsigned int i = 0; i < GAIN; i++) {
+	    digitalWrite(PD_SCK, HIGH);
+	    digitalWrite(PD_SCK, LOW);
+	  }
+        }
+	
 	// Replicate the most significant bit to pad out a 32-bit signed integer
 	if (data[2] & 0x80) {
 		filler = 0xFF;
