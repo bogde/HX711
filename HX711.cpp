@@ -18,6 +18,28 @@
 	#endif
 #endif
 
+#ifdef ESP_H
+uint8_t shiftInSlow(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder) {
+    uint8_t value = 0;
+    uint8_t i;
+
+    for(i = 0; i < 8; ++i) {
+        digitalWrite(clockPin, HIGH);
+        delayMicroseconds(1);
+        if(bitOrder == LSBFIRST)
+            value |= digitalRead(dataPin) << i;
+        else
+            value |= digitalRead(dataPin) << (7 - i);
+        digitalWrite(clockPin, LOW);
+        delayMicroseconds(1);
+    }
+    return value;
+}
+#define SHIFTIN_WITH_SPEED_SUPPORT(data,clock,order) shiftInSlow(data,clock,order)
+#else
+#define SHIFTIN_WITH_SPEED_SUPPORT(data,clock,order) shiftIn(data,clock,order)
+#endif
+
 HX711::HX711() {
 }
 
@@ -67,14 +89,20 @@ long HX711::read() {
 	uint8_t filler = 0x00;
 
 	// pulse the clock pin 24 times to read the data
-	data[2] = shiftIn(DOUT, PD_SCK, MSBFIRST);
-	data[1] = shiftIn(DOUT, PD_SCK, MSBFIRST);
-	data[0] = shiftIn(DOUT, PD_SCK, MSBFIRST);
+	data[2] = SHIFTIN_WITH_SPEED_SUPPORT(DOUT, PD_SCK, MSBFIRST);
+	data[1] = SHIFTIN_WITH_SPEED_SUPPORT(DOUT, PD_SCK, MSBFIRST);
+	data[0] = SHIFTIN_WITH_SPEED_SUPPORT(DOUT, PD_SCK, MSBFIRST);
 
 	// set the channel and the gain factor for the next reading using the clock pin
 	for (unsigned int i = 0; i < GAIN; i++) {
 		digitalWrite(PD_SCK, HIGH);
+		#ifdef ESP_H
+		delayMicroseconds(1);
+		#endif
 		digitalWrite(PD_SCK, LOW);
+		#ifdef ESP_H
+		delayMicroseconds(1);
+		#endif
 	}
 
 	// Replicate the most significant bit to pad out a 32-bit signed integer
