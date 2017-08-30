@@ -13,8 +13,8 @@ class HX711
 		byte PD_SCK;	// Power Down and Serial Clock Input Pin
 		byte DOUT;		// Serial Data Output Pin
 		byte GAIN;		// amplification factor
-		long OFFSET = 0;	// used for tare weight
-		float SCALE = 1;	// used to return weight in grams, kg, ounces, whatever
+		long OFFSET;	        // used for tare weight
+		float SCALE;    	// used to return weight in grams, kg, ounces, whatever
 
 	public:
 		// define clock and data pin, channel, and gain factor
@@ -46,7 +46,7 @@ class HX711
 		long read_average(byte times = 10);
 
 		// returns (read_average() - OFFSET), that is the current value without the tare weight; times = how many readings to do
-		double get_value(byte times = 1);
+		long get_value(byte times = 1);
 
 		// returns get_value() divided by SCALE, that is the raw value divided by a value obtained via calibration
 		// times = how many readings to do
