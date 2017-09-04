@@ -7,6 +7,10 @@
     void yield(void) {};
 #endif
 
+#ifdef ARDUINO_ARCH_ESP8266
+  #define USE_WDT
+#endif
+
 HX711::HX711(byte dout, byte pd_sck, byte gain) {
 	begin(dout, pd_sck, gain);
 }
@@ -52,7 +56,11 @@ long HX711::read() {
 	// wait for the chip to become ready
 	while (!is_ready()) {
 		// Will do nothing on Arduino but prevent resets of ESP8266 (Watchdog Issue)
+    #ifdef USE_WDT
+    ESP.wdtFeed();
+    #else
 		yield();
+    #endif
 	}
 
 	unsigned long value = 0;
@@ -90,7 +98,11 @@ long HX711::read_average(byte times) {
 	long sum = 0;
 	for (byte i = 0; i < times; i++) {
 		sum += read();
+    #ifdef USE_WDT
+    ESP.wdtFeed();
+    #else
 		yield();
+    #endif
 	}
 	return sum / times;
 }
