@@ -52,7 +52,7 @@ long HX711::read() {
 	// wait for the chip to become ready
 	while (!is_ready()) {
 		// Will do nothing on Arduino but prevent resets of ESP8266 (Watchdog Issue)
-		yield();
+		delay(0);
 	}
 
 	unsigned long value = 0;
