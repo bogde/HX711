@@ -7,6 +7,9 @@
     void yield(void) {};
 #endif
 
+
+
+
 HX711::HX711(byte dout, byte pd_sck, byte gain) {
 	begin(dout, pd_sck, gain);
 }
@@ -48,6 +51,64 @@ void HX711::set_gain(byte gain) {
 	read();
 }
 
+#ifdef SLOW_DOWN_SHIFT_IN
+uint8_t HX711::shiftInMsbFirstWithDelay(uint8_t dataPin, uint8_t clockPin) {
+		uint8_t mask, value=0;
+        for (mask=0x80; mask; mask >>= 1) {
+                digitalWrite(clockPin, HIGH);
+                delayMicroseconds(1);
+                if (digitalRead(dataPin)) value |= mask;
+                digitalWrite(clockPin, LOW);
+                delayMicroseconds(1);
+        }
+        return value;
+}
+#endif
+
+
+
+bool HX711::readNonBlocking() {
+
+
+	unsigned long value = 0;
+	uint8_t data[3] = { 0 };
+	uint8_t filler = 0x00;
+
+
+	// pulse the clock pin 24 times to read the data
+    #ifdef SLOW_DOWN_SHIFT_IN
+    data[2] = shiftInMsbFirstWithDelay(DOUT,PD_SCK);
+    data[1] = shiftInMsbFirstWithDelay(DOUT,PD_SCK);
+    data[0] = shiftInMsbFirstWithDelay(DOUT,PD_SCK);
+    #else
+    data[2] = shiftIn(DOUT, PD_SCK, MSBFIRST);
+	data[1] = shiftIn(DOUT, PD_SCK, MSBFIRST);
+	data[0] = shiftIn(DOUT, PD_SCK, MSBFIRST);
+    #endif
+
+
+	// set the channel and the gain factor for the next reading using the clock pin
+	for (unsigned int i = 0; i < GAIN; i++) {
+		digitalWrite(PD_SCK, HIGH);
+		digitalWrite(PD_SCK, LOW);
+	}
+
+	// Replicate the most significant bit to pad out a 32-bit signed integer
+	if (data[2] & 0x80) {
+		filler = 0xFF;
+	} else {
+		filler = 0x00;
+	}
+
+	// Construct a 32-bit signed integer
+	value = ( static_cast<unsigned long>(filler) << 24
+			| static_cast<unsigned long>(data[2]) << 16
+			| static_cast<unsigned long>(data[1]) << 8
+			| static_cast<unsigned long>(data[0]) );
+
+	return static_cast<long>(value);
+}
+
 long HX711::read() {
 	// wait for the chip to become ready
 	while (!is_ready()) {
@@ -59,10 +120,18 @@ long HX711::read() {
 	uint8_t data[3] = { 0 };
 	uint8_t filler = 0x00;
 
+
 	// pulse the clock pin 24 times to read the data
-	data[2] = shiftIn(DOUT, PD_SCK, MSBFIRST);
+    #ifdef SLOW_DOWN_SHIFT_IN
+    data[2] = shiftInMsbFirstWithDelay(DOUT,PD_SCK);
+    data[1] = shiftInMsbFirstWithDelay(DOUT,PD_SCK);
+    data[0] = shiftInMsbFirstWithDelay(DOUT,PD_SCK);
+    #else
+    data[2] = shiftIn(DOUT, PD_SCK, MSBFIRST);
 	data[1] = shiftIn(DOUT, PD_SCK, MSBFIRST);
 	data[0] = shiftIn(DOUT, PD_SCK, MSBFIRST);
+    #endif
+
 
 	// set the channel and the gain factor for the next reading using the clock pin
 	for (unsigned int i = 0; i < GAIN; i++) {
