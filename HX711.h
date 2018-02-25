@@ -50,11 +50,6 @@ class HX711
 		// waits for the chip to be ready and returns a reading
 		long read();
         
-        // does not wait for the chip to be ready and returns a reading
-        // check if the chip is_ready() before making a call to 
-        // readNonBlocking()
-        bool readNonBlocking();
-
 		// returns an average reading; times = how many times to read
 		long read_average(byte times = 10);
 

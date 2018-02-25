@@ -66,49 +66,6 @@ uint8_t HX711::shiftInMsbFirstWithDelay(uint8_t dataPin, uint8_t clockPin) {
 #endif
 
 
-
-bool HX711::readNonBlocking() {
-
-
-	unsigned long value = 0;
-	uint8_t data[3] = { 0 };
-	uint8_t filler = 0x00;
-
-
-	// pulse the clock pin 24 times to read the data
-    #ifdef SLOW_DOWN_SHIFT_IN
-    data[2] = shiftInMsbFirstWithDelay(DOUT,PD_SCK);
-    data[1] = shiftInMsbFirstWithDelay(DOUT,PD_SCK);
-    data[0] = shiftInMsbFirstWithDelay(DOUT,PD_SCK);
-    #else
-    data[2] = shiftIn(DOUT, PD_SCK, MSBFIRST);
-	data[1] = shiftIn(DOUT, PD_SCK, MSBFIRST);
-	data[0] = shiftIn(DOUT, PD_SCK, MSBFIRST);
-    #endif
-
-
-	// set the channel and the gain factor for the next reading using the clock pin
-	for (unsigned int i = 0; i < GAIN; i++) {
-		digitalWrite(PD_SCK, HIGH);
-		digitalWrite(PD_SCK, LOW);
-	}
-
-	// Replicate the most significant bit to pad out a 32-bit signed integer
-	if (data[2] & 0x80) {
-		filler = 0xFF;
-	} else {
-		filler = 0x00;
-	}
-
-	// Construct a 32-bit signed integer
-	value = ( static_cast<unsigned long>(filler) << 24
-			| static_cast<unsigned long>(data[2]) << 16
-			| static_cast<unsigned long>(data[1]) << 8
-			| static_cast<unsigned long>(data[0]) );
-
-	return static_cast<long>(value);
-}
-
 long HX711::read() {
 	// wait for the chip to become ready
 	while (!is_ready()) {
