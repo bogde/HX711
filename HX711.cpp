@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <HX711.h>
+#include "HX711.h"
 
 #if ARDUINO_VERSION <= 106
     // "yield" is not implemented as noop in older Arduino Core releases, so let's define it.
