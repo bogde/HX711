@@ -1,0 +1,30 @@
+#######################################
+# HX711
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+HX711	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+is_ready	KEYWORD2
+set_gain	KEYWORD2
+read_average	KEYWORD2
+get_value	KEYWORD2
+get_units	KEYWORD2
+tare	KEYWORD2
+set_scale	KEYWORD2
+get_scale	KEYWORD2
+set_offset	KEYWORD2
+get_offset	KEYWORD2
+power_down	KEYWORD2
+power_up	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
