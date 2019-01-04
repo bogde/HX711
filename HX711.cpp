@@ -7,11 +7,13 @@
     void yield(void) {};
 #endif
 
-HX711::HX711(byte dout, byte pd_sck, byte gain) {
+HX711::HX711(byte dout, byte pd_sck, byte gain) :
+		OFFSET(0), SCALE(1.0) {
 	begin(dout, pd_sck, gain);
 }
 
-HX711::HX711() {
+HX711::HX711() :
+		GAIN(1), PD_SCK(-1), DOUT(-1), OFFSET(0), SCALE(1.0) {
 }
 
 HX711::~HX711() {
@@ -45,7 +47,7 @@ void HX711::set_gain(byte gain) {
 	}
 
 	digitalWrite(PD_SCK, LOW);
-	read();
+	read_average(1 + 6); //6 times is invalid.
 }
 
 long HX711::read() {
@@ -95,16 +97,16 @@ long HX711::read_average(byte times) {
 	return sum / times;
 }
 
-double HX711::get_value(byte times) {
+long HX711::get_value(byte times) {
 	return read_average(times) - OFFSET;
 }
 
 float HX711::get_units(byte times) {
-	return get_value(times) / SCALE;
+	return (float) get_value(times) / SCALE;
 }
 
 void HX711::tare(byte times) {
-	double sum = read_average(times);
+	long sum = read_average(times);
 	set_offset(sum);
 }
 
@@ -130,5 +132,9 @@ void HX711::power_down() {
 }
 
 void HX711::power_up() {
+	long dump = 0;
 	digitalWrite(PD_SCK, LOW);
+	//When power up, default gain is 128, channel A.
+	//rate is 10Hz, so 400ms is 5 times.
+	dump = read_average(6); //5 times is invalid.
 }
