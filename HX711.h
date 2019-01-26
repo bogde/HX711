@@ -34,10 +34,10 @@ class HX711
 		// input PD_SCK should be low. When DOUT goes to low, it indicates data is ready for retrieval.
 		bool is_ready();
 
-		// set the gain factor; takes effect only after a call to read()
+		// set the gain factor; read() is invoked to set the new gain and its return value is returned
 		// channel A can be set for a 128 or 64 gain; channel B has a fixed 32 gain
 		// depending on the parameter, the channel is also set to either A or B
-		void set_gain(byte gain = 128);
+		long set_gain(byte gain = 128);
 
 		// waits for the chip to be ready and returns a reading
 		long read();

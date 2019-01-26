@@ -35,7 +35,7 @@ bool HX711::is_ready() {
 	return digitalRead(DOUT) == LOW;
 }
 
-void HX711::set_gain(byte gain) {
+long HX711::set_gain(byte gain) {
 	switch (gain) {
 		case 128:		// channel A, gain factor 128
 			GAIN = 1;
@@ -49,7 +49,8 @@ void HX711::set_gain(byte gain) {
 	}
 
 	digitalWrite(PD_SCK, LOW);
-	read();
+	// read one more value with old gain/channel to update settings
+	return read();
 }
 
 long HX711::read() {
