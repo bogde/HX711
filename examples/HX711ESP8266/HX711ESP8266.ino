@@ -1,14 +1,14 @@
 #include "HX711.h"
 
-// HX711.DOUT	- pin #D2
-// HX711.PD_SCK	- pin #D3
+// HX711.DOUT	- pin #2
+// HX711.PD_SCK	- pin #3
 
-HX711 scale(D2, D3);		// parameter "gain" is ommited; the default value 128 is used by the library
+HX711 scale;		// parameter "gain" is ommited; the default value 128 is used by the library
 
 void setup() {
   Serial.begin(38400);
   // usually the begin method is called by the class builder but in case of esp8266 must be called explicitly in the setup
-  scale.begin(D2,D3); //esp specific statment 
+  scale.begin(2,3); //esp specific statment 
   Serial.println("HX711 Demo");
 
   Serial.println("Before setting up the scale:");
