@@ -17,16 +17,15 @@ class HX711
 		float SCALE = 1;	// used to return weight in grams, kg, ounces, whatever
 
 	public:
-		// define clock and data pin, channel, and gain factor
-		// channel selection is made by passing the appropriate gain: 128 or 64 for channel A, 32 for channel B
-		// gain: 128 or 64 for channel A; channel B works with 32 gain factor only
-		HX711(byte dout, byte pd_sck, byte gain = 128);
 
 		HX711();
 
 		virtual ~HX711();
 
-		// Allows to set the pins and gain later than in the constructor
+		// Initialize library with clock and data pin, channel, and gain factor.
+		// Channel selection is made by passing the appropriate gain:
+		// - Channel A works with a gain factor of 128 or 64
+		// - Channel B works with a gain factor of 32 only
 		void begin(byte dout, byte pd_sck, byte gain = 128);
 
 		// check if HX711 is ready

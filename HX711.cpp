@@ -9,12 +9,6 @@
 	#endif
 #endif
 
-HX711::HX711(byte dout, byte pd_sck, byte gain) {
-	#ifndef ESP8266
-	begin(dout, pd_sck, gain);
-	#endif
-}
-
 HX711::HX711() {
 }
 
