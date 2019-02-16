@@ -10,12 +10,10 @@
 #include <Arduino.h>
 #include <HX711.h>
 
-#ifndef ESP_H
-	#if ARDUINO <= 106
-    // "yield" is not implemented as noop in older Arduino Core releases, so let's define it.
-    // See also: https://stackoverflow.com/questions/34497758/what-is-the-secret-of-the-arduino-yieldfunction/34498165#34498165
-   	void yield(void) {};
-	#endif
+#if defined(ARDUINO) && ARDUINO <= 106
+	// "yield" is not implemented as noop in older Arduino Core releases, so let's define it.
+	// See also: https://stackoverflow.com/questions/34497758/what-is-the-secret-of-the-arduino-yieldfunction/34498165#34498165
+	void yield(void) {};
 #endif
 
 #if defined(ESP_H) || defined(CORE_TEENSY)
