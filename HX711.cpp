@@ -18,7 +18,11 @@
 	#endif
 #endif
 
-#ifdef ESP_H
+#if defined(ESP_H) || defined(CORE_TEENSY)
+// Make shiftIn() be aware of clockspeed for ESP32, Teensy 3.x and friends
+// https://github.com/bogde/HX711/issues/75
+// https://github.com/arduino/Arduino/issues/6561
+// https://community.hiveeyes.org/t/using-bogdans-canonical-hx711-library-on-the-esp32/539
 uint8_t shiftInSlow(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder) {
     uint8_t value = 0;
     uint8_t i;
