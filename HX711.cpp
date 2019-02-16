@@ -14,12 +14,6 @@
 #include <util/atomic.h>
 #endif
 
-#if defined(ARDUINO) && ARDUINO <= 106
-	// "yield" is not implemented as noop in older Arduino Core releases, so let's define it.
-	// See also: https://stackoverflow.com/questions/34497758/what-is-the-secret-of-the-arduino-yieldfunction/34498165#34498165
-	void yield(void) {};
-#endif
-
 #if defined(ESP_H) || defined(CORE_TEENSY)
 // Make shiftIn() be aware of clockspeed for ESP32, Teensy 3.x and friends
 // https://github.com/bogde/HX711/issues/75
@@ -84,10 +78,12 @@ void HX711::set_gain(byte gain) {
 }
 
 long HX711::read() {
-	// wait for the chip to become ready
+
+	// Wait for the chip to become ready
 	while (!is_ready()) {
-		// Will do nothing on Arduino but prevent resets of ESP8266 (Watchdog Issue)
-		yield();
+		// Probably will do no harm on AVR but will feed the Watchdog Timer (WDT) on ESP.
+		// https://github.com/bogde/HX711/issues/73
+		delay(0);
 	}
 
 	unsigned long value = 0;
@@ -167,7 +163,9 @@ long HX711::read_average(byte times) {
 	long sum = 0;
 	for (byte i = 0; i < times; i++) {
 		sum += read();
-		yield();
+		// Probably will do no harm on AVR but will feed the Watchdog Timer (WDT) on ESP.
+		// https://github.com/bogde/HX711/issues/73
+		delay(0);
 	}
 	return sum / times;
 }
