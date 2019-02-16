@@ -1,3 +1,12 @@
+/**
+ *
+ * HX711 library for Arduino
+ * https://github.com/bogde/HX711
+ *
+ * MIT License
+ * (c) 2018 Bogdan Necula
+ *
+**/
 #include <Arduino.h>
 #include <HX711.h>
 

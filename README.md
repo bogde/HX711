@@ -31,5 +31,9 @@ Although other libraries exist, I needed a slightly different approach, so here'
 5. Adjust the parameter in step 4 until you get an accurate reading.
 
 # How to use
-See the example in examples/HX711SerialBegin. Please don't use examples/HX711Serial anymore. It is deprecated because the pin definition within the constructor
-is not timing safe. (#29)
+See the example `examples/hx711_example.ino`.
+
+## Deprecating warning
+This library got a spring-cleaning in February 2019, removing the pin definition
+within the constructor completely, as this was not timing safe. (#29)
+Please use the new initialization flavor as outlined on the example above.

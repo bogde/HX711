@@ -1,3 +1,12 @@
+/**
+ *
+ * HX711 library for Arduino
+ * https://github.com/bogde/HX711
+ *
+ * MIT License
+ * (c) 2018 Bogdan Necula
+ *
+**/
 #ifndef HX711_h
 #define HX711_h
 
@@ -22,10 +31,11 @@ class HX711
 
 		virtual ~HX711();
 
-		// Initialize library with clock and data pin, channel, and gain factor.
+		// Initialize library with data output pin, clock input pin and gain factor.
 		// Channel selection is made by passing the appropriate gain:
-		// - Channel A works with a gain factor of 128 or 64
-		// - Channel B works with a gain factor of 32 only
+		// - With a gain factor of 64 or 128, channel A is selected
+		// - With a gain factor of 32, channel B is selected
+		// The library default is "128" (Channel A).
 		void begin(byte dout, byte pd_sck, byte gain = 128);
 
 		// check if HX711 is ready
