@@ -90,6 +90,16 @@ long HX711::read() {
 	uint8_t data[3] = { 0 };
 	uint8_t filler = 0x00;
 
+	#ifdef ESP_H
+	// Begin of critical section.
+	// Critical sections are used as a valid protection method
+	// against simultaneous access in vanilla FreeRTOS.
+	// Disable the scheduler and call portDISABLE_INTERRUPTS. This prevents
+	// context switches and servicing of ISRs during a critical section.
+	portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
+	portENTER_CRITICAL(&mux);
+	#endif
+
 	// pulse the clock pin 24 times to read the data
 	data[2] = SHIFTIN_WITH_SPEED_SUPPORT(DOUT, PD_SCK, MSBFIRST);
 	data[1] = SHIFTIN_WITH_SPEED_SUPPORT(DOUT, PD_SCK, MSBFIRST);
@@ -106,6 +116,11 @@ long HX711::read() {
 		delayMicroseconds(1);
 		#endif
 	}
+
+	#ifdef ESP_H
+	// End of critical section.
+	portEXIT_CRITICAL(&mux);
+	#endif
 
 	// Replicate the most significant bit to pad out a 32-bit signed integer
 	if (data[2] & 0x80) {
