@@ -7,6 +7,10 @@
 #include "WProgram.h"
 #endif
 
+#if defined(__MK20DX128__) || defined(__MK20DX256__)
+		#define SLOW_DOWN_SHIFT_IN
+#endif
+
 class HX711
 {
 	private:
@@ -25,6 +29,10 @@ class HX711
 		HX711();
 
 		virtual ~HX711();
+/* Teensy 3.0 & 3.1 */
+#ifdef SLOW_DOWN_SHIFT_IN
+		uint8_t shiftInMsbFirstWithDelay(uint8_t dataPin, uint8_t clockPin);
+#endif
 
 		// Allows to set the pins and gain later than in the constructor
 		void begin(byte dout, byte pd_sck, byte gain = 128);
@@ -41,7 +49,7 @@ class HX711
 
 		// waits for the chip to be ready and returns a reading
 		long read();
-
+        
 		// returns an average reading; times = how many times to read
 		long read_average(byte times = 10);
 
