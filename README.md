@@ -118,7 +118,10 @@ Environment feather_328	[SUCCESS]
 Environment atmega_2560	[SUCCESS]
 Environment huzzah     	[SUCCESS]
 Environment lopy4      	[SUCCESS]
+Environment teensy31   	[SUCCESS]
+Environment teensy36   	[SUCCESS]
 Environment feather_m0 	[SUCCESS]
+Environment arduino_due	[SUCCESS]
 Environment feather_m4 	[SUCCESS]
 Environment bluepill   	[SUCCESS]
 ```
@@ -127,10 +130,13 @@ Environment bluepill   	[SUCCESS]
 https://gist.github.com/amotl/5ed6b3eb1fcd2bc78552b218b426f6aa
 
 
-### Specific architecture
+### Specific environment
 
-    source .venv2/bin/activate
-    platformio run --environment lopy4
+    # Build for LoPy4
+    make build-env environment=lopy4
+
+    # Build for Feather M0
+    make build-env environment=feather_m0
 
 
 ## Credits

@@ -27,6 +27,8 @@ install-platformio: setup-virtualenv
 build-all: install-platformio
 	@$(platformio) run
 
+build-env: install-platformio
+	@$(platformio) run --environment $(environment)
 
 
 # Note: This are legacy build targets, the new ones are defined through `platformio.ini`.

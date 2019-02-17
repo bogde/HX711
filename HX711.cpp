@@ -10,16 +10,29 @@
 #include <Arduino.h>
 #include <HX711.h>
 
-#ifdef ARDUINO_ARCH_AVR
+#define ARCH_ESPRESSIF (defined(ARDUINO_ARCH_ESP8266) || defined(ARDUINO_ARCH_ESP32))
+
+// TEENSYDUINO has a port of Dean Camera's ATOMIC_BLOCK macros for AVR to ARM Cortex M3
+#define HAS_ATOMIC_BLOCK (defined(ARDUINO_ARCH_AVR) || defined(TEENSYDUINO))
+#define FAST_CPU \
+    ( \
+    ARCH_ESPRESSIF || \
+    defined(ARDUINO_ARCH_SAM)     || defined(ARDUINO_ARCH_SAMD) || \
+    defined(ARDUINO_ARCH_STM32)   || defined(TEENSYDUINO) \
+    )
+
+#if HAS_ATOMIC_BLOCK
 // Acquire AVR-specific ATOMIC_BLOCK(ATOMIC_RESTORESTATE) macro
 #include <util/atomic.h>
 #endif
 
-#if defined(ARDUINO_ARCH_ESP8266) || defined(ARDUINO_ARCH_ESP32) || defined(ARDUINO_ARCH_SAMD) || defined(ARDUINO_ARCH_STM32)
-// Make shiftIn() be aware of clockspeed for ESP32, Teensy 3.x and friends
-// https://github.com/bogde/HX711/issues/75
-// https://github.com/arduino/Arduino/issues/6561
-// https://community.hiveeyes.org/t/using-bogdans-canonical-hx711-library-on-the-esp32/539
+#if FAST_CPU
+// Make shiftIn() be aware of clockspeed for
+// faster CPUs like ESP32, Teensy 3.x and friends
+// See also:
+// - https://github.com/bogde/HX711/issues/75
+// - https://github.com/arduino/Arduino/issues/6561
+// - https://community.hiveeyes.org/t/using-bogdans-canonical-hx711-library-on-the-esp32/539
 uint8_t shiftInSlow(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder) {
     uint8_t value = 0;
     uint8_t i;
@@ -105,7 +118,7 @@ long HX711::read() {
 	// state after the sequence completes, insuring that the entire read-and-gain-set
 	// sequence is not interrupted.  The macro has a few minor advantages over bracketing
 	// the sequence between `noInterrupts()` and `interrupts()` calls.
-	#ifdef ARDUINO_ARCH_AVR
+	#if HAS_ATOMIC_BLOCK
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
 	#endif
 
@@ -131,11 +144,11 @@ long HX711::read() {
 	// set the channel and the gain factor for the next reading using the clock pin
 	for (unsigned int i = 0; i < GAIN; i++) {
 		digitalWrite(PD_SCK, HIGH);
-		#if defined(ARDUINO_ARCH_ESP8266) || defined(ARDUINO_ARCH_ESP32)
+		#if ARCH_ESPRESSIF
 		delayMicroseconds(1);
 		#endif
 		digitalWrite(PD_SCK, LOW);
-		#if defined(ARDUINO_ARCH_ESP8266) || defined(ARDUINO_ARCH_ESP32)
+		#if ARCH_ESPRESSIF
 		delayMicroseconds(1);
 		#endif
 	}
@@ -149,7 +162,7 @@ long HX711::read() {
 	interrupts();
 	#endif
 
-	#ifdef ARDUINO_ARCH_AVR
+	#if HAS_ATOMIC_BLOCK
 	}
 	#endif
 
