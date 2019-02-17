@@ -107,7 +107,7 @@ long HX711::read() {
 	// the sequence between `noInterrupts()` and `interrupts()` calls.
 	#ifdef ARDUINO_ARCH_AVR
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-    #endif
+	#endif
 
 	#ifdef ARDUINO_ARCH_ESP8266
 	noInterrupts();

@@ -114,13 +114,13 @@ effectively running all targets defined in `platformio.ini`.
 
 #### Result
 ```
-Environment atmega      [SUCCESS]
-Environment feather_328 [SUCCESS]
-Environment huzzah      [SUCCESS]
-Environment lopy4       [SUCCESS]
-Environment feather_m0  [SUCCESS]
-Environment feather_m4  [SUCCESS]
-Environment bluepill    [SUCCESS]
+Environment feather_328	[SUCCESS]
+Environment atmega_2560	[SUCCESS]
+Environment huzzah     	[SUCCESS]
+Environment lopy4      	[SUCCESS]
+Environment feather_m0 	[SUCCESS]
+Environment feather_m4 	[SUCCESS]
+Environment bluepill   	[SUCCESS]
 ```
 
 #### Details

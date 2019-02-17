@@ -27,6 +27,10 @@ Build all environments
 
     platformio run
 
+"Make clean" for all environments
+
+    platformio run -t clean
+
 
 Dump specific build environment
 

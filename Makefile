@@ -50,6 +50,8 @@ ci-all: install-platformio
 	$(MAKE) ci-basic board=adafruit_feather_m0
 	$(MAKE) ci-basic board=adafruit_feather_m4
 
+	# bluepill
+	$(MAKE) ci-basic board=bluepill_f103c8
 
 ci-basic:
 	$(platformio) ci --board=$(board) --lib="." examples/HX711_basic_example --verbose
