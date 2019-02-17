@@ -6,7 +6,7 @@
         "type": "git",
         "url": "https://github.com/bogde/HX711.git"
     },
-    "version": "0.1",
+    "version": "0.3.0-dev1",
     "exclude": "tests",
     "examples": "examples/*/*.ino",
     "frameworks": "arduino",
