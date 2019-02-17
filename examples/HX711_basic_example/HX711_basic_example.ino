@@ -1,13 +1,17 @@
 #include "HX711.h"
 
 // CIRCUIT:
-// HX711 DOUT TO PIN 2 
+// HX711 DOUT   TO PIN 2
 // HX711 PD_SCK	TO PIN 3
+//
+// Pin definitions D2 and D3 are provided by "nodemcu" board,
+// see `nodemcu/pins_arduino.h`.
 
-HX711 scale(2, 3);
+HX711 scale;
 
 void setup() {
   Serial.begin(57600);
+  scale.begin(D2, D3);
 }
 
 void loop() {

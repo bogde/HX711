@@ -12,7 +12,7 @@
  *
  * Pin definition examples
  *
- * AVR
+ * AVR and friends
  * HX711.DOUT	- pin #A1
  * HX711.PD_SCK - pin #A0
  *
