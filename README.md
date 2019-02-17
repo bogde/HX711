@@ -1,6 +1,12 @@
 # HX711
 An Arduino library to interface the [Avia Semiconductor HX711 24-Bit Analog-to-Digital Converter (ADC)] for Weight Scales.
 
+It supports the platforms `atmelavr`, `espressif8266`, `espressif32`
+and `atmelsam` by corresponding [PlatformIO] build environments.
+
+[Avia Semiconductor HX711 24-Bit Analog-to-Digital Converter (ADC)]: http://www.dfrobot.com/image/data/SEN0160/hx711_english.pdf
+[PlatformIO]: https://platformio.org/
+
 
 ## Synopsis
 ```c++
@@ -42,6 +48,9 @@ See `examples/hx711_example.ino` in this repository.
 - [Arduino core for ESP32](https://github.com/espressif/arduino-esp32) (untested)
 - [Arduino core for SAMD21](https://github.com/arduino/ArduinoCore-samd) (untested)
 - [Arduino core for SAMD21 and SAMD51](https://github.com/adafruit/ArduinoCore-samd) (untested)
+
+Please note this revamped library has not been tested on real hardware yet.
+However, compilation of all environments defined in `platformio.ini` succeeds.
 
 
 ## Features
@@ -86,26 +95,51 @@ See `examples/hx711_example.ino` in this repository.
 5. Adjust the parameter in step 4 until you get an accurate reading.
 
 
-## Deprecating warning
+## Deprecation warning
 This library received some spring-cleaning in February 2019, removing
 the pin definition within the constructor completely, as this was not
 timing safe. (#29) Please use the new initialization flavor as outlined
 in the example above.
 
 
+## Build
+
+### All architectures
+This will spawn a Python virtualenv in the current directory,
+install `platformio` into it and then execute `platformio run`.
+effectively running all targets defined in `platformio.ini`.
+
+    make build-all
+
+#### Result
+```
+Environment atmega      [SUCCESS]
+Environment feather_328 [SUCCESS]
+Environment huzzah      [SUCCESS]
+Environment lopy4       [SUCCESS]
+Environment feather_m0  [SUCCESS]
+Environment feather_m4  [SUCCESS]
+```
+
+#### Details
+https://gist.github.com/amotl/5ed6b3eb1fcd2bc78552b218b426f6aa
+
+
+### Specific architecture
+
+    source .venv2/bin/activate
+    platformio run --environment lopy4
+
+
 ## Credits
-- This library is where everything started from
-  https://github.com/aguegu/ardulibs/tree/master/hx711
-- Contributions for supporting ESP32
-  - https://github.com/lemio/HX711
-  - https://github.com/bogde/HX711/issues/75
-- Many contributions by others. Thanks!
+Thanks to Weihong Guan who started the first version of this library in 2012
+already (see [[arduino|module]Hx711 electronic scale kit](http://aguegu.net/?p=1327),
+[sources](https://github.com/aguegu/ardulibs/tree/master/hx711)), Bogdan Necula
+who took over in 2014 and last but not least all others who contributed to this
+library over the course of the last years, see also `CONTRIBUTORS.rst` in this
+repository.
 
 
 ## Similar libraries
-- https://github.com/aguegu/ardulibs/tree/master/hx711
 - https://github.com/olkal/HX711_ADC
 - https://github.com/queuetue/Q2-HX711-Arduino-Library
-
-
-[Avia Semiconductor HX711 24-Bit Analog-to-Digital Converter (ADC)]: http://www.dfrobot.com/image/data/SEN0160/hx711_english.pdf
