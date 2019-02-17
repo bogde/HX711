@@ -14,3 +14,4 @@ install:
 script:
     - platformio ci --board=megaatmega2560 --lib="." examples/HX711_full_example
     - platformio ci --board=megaatmega2560 --lib="." examples/HX711_timeout_example
+    - platformio run

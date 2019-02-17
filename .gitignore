@@ -14,3 +14,7 @@
 
 # IDE metadata
 /.idea
+
+# PlatformIO virtualenv and pioenv
+/.venv*
+/.pioenvs
