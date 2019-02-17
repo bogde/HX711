@@ -14,7 +14,8 @@
 #include <util/atomic.h>
 #endif
 
-#if defined(ESP_H) || defined(CORE_TEENSY)
+#if defined(ESP8266) || defined(ESP32) || defined(ARDUINO_ARCH_SAMD)
+dscdc
 // Make shiftIn() be aware of clockspeed for ESP32, Teensy 3.x and friends
 // https://github.com/bogde/HX711/issues/75
 // https://github.com/arduino/Arduino/issues/6561
@@ -39,6 +40,7 @@ uint8_t shiftInSlow(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder) {
 #else
 #define SHIFTIN_WITH_SPEED_SUPPORT(data,clock,order) shiftIn(data,clock,order)
 #endif
+
 
 HX711::HX711() {
 }
@@ -102,12 +104,16 @@ long HX711::read() {
 	// interrupts during the sequence and then restores the interrupt mask to its previous
 	// state after the sequence completes, insuring that the entire read-and-gain-set
 	// sequence is not interrupted.  The macro has a few minor advantages over bracketing
-	// the sequence between NoInterrupts() and interrupts() calls.
+	// the sequence between `noInterrupts()` and `interrupts()` calls.
 	#ifdef AVR
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    #endif
+
+	#ifdef ESP8266
+	noInterrupts();
 	#endif
 
-	#ifdef ESP_H
+	#ifdef ESP32
 	// Begin of critical section.
 	// Critical sections are used as a valid protection method
 	// against simultaneous access in vanilla FreeRTOS.
@@ -125,18 +131,22 @@ long HX711::read() {
 	// set the channel and the gain factor for the next reading using the clock pin
 	for (unsigned int i = 0; i < GAIN; i++) {
 		digitalWrite(PD_SCK, HIGH);
-		#ifdef ESP_H
+		#if defined(ESP8266) || defined(ESP32)
 		delayMicroseconds(1);
 		#endif
 		digitalWrite(PD_SCK, LOW);
-		#ifdef ESP_H
+		#if defined(ESP8266) || defined(ESP32)
 		delayMicroseconds(1);
 		#endif
 	}
 
-	#ifdef ESP_H
+	#ifdef ESP32
 	// End of critical section.
 	portEXIT_CRITICAL(&mux);
+	#endif
+
+	#ifdef ESP8266
+	interrupts();
 	#endif
 
 	#ifdef AVR
