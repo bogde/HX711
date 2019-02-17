@@ -2,8 +2,6 @@
 
 
 ## Miscellaneous
-- [x] Add ``platformio.ini``: https://docs.platformio.org/en/latest/projectconf.html
-- [] Make it a real PlatformIO library (layout-wise)
 - [] Get library into https://www.arduinolibraries.info/ and https://platformio.org/
 - [] Maybe use constructor-based initialization again?
 - [] Unify critical sections / interrupt disabling between platforms?
