@@ -1,8 +1,8 @@
 # HX711
 An Arduino library to interface the [Avia Semiconductor HX711 24-Bit Analog-to-Digital Converter (ADC)] for Weight Scales.
 
-It supports the platforms `atmelavr`, `espressif8266`, `espressif32`
-and `atmelsam` by corresponding [PlatformIO] build environments.
+It supports the platforms `atmelavr`, `espressif8266`, `espressif32`,
+`atmelsam` and `ststm32` by corresponding [PlatformIO] build environments.
 
 [Avia Semiconductor HX711 24-Bit Analog-to-Digital Converter (ADC)]: http://www.dfrobot.com/image/data/SEN0160/hx711_english.pdf
 [PlatformIO]: https://platformio.org/
@@ -48,6 +48,7 @@ See `examples/hx711_example.ino` in this repository.
 - [Arduino core for ESP32](https://github.com/espressif/arduino-esp32) (untested)
 - [Arduino core for SAMD21](https://github.com/arduino/ArduinoCore-samd) (untested)
 - [Arduino core for SAMD21 and SAMD51](https://github.com/adafruit/ArduinoCore-samd) (untested)
+- [Arduino core for STM32](https://github.com/stm32duino/Arduino_Core_STM32) (untested)
 
 Please note this revamped library has not been tested on real hardware yet.
 However, compilation of all environments defined in `platformio.ini` succeeds.
