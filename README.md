@@ -119,6 +119,7 @@ Environment huzzah      [SUCCESS]
 Environment lopy4       [SUCCESS]
 Environment feather_m0  [SUCCESS]
 Environment feather_m4  [SUCCESS]
+Environment bluepill    [SUCCESS]
 ```
 
 #### Details
