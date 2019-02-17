@@ -141,7 +141,14 @@ who took over in 2014 and last but not least all others who contributed to this
 library over the course of the last years, see also `CONTRIBUTORS.rst` in this
 repository.
 
+### See also
+- https://item.taobao.com/item.htm?id=18121631630
+- https://item.taobao.com/item.htm?id=544769386300
+
 
 ## Similar libraries
+
+There are other libraries around, enjoy:
+
 - https://github.com/olkal/HX711_ADC
 - https://github.com/queuetue/Q2-HX711-Arduino-Library

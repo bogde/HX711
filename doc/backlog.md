@@ -2,12 +2,14 @@
 
 
 ## Miscellaneous
-- [] Get library into https://www.arduinolibraries.info/ and https://platformio.org/
-- [] Maybe use constructor-based initialization again?
-- [] Unify critical sections / interrupt disabling between platforms?
+- [o] Get library into https://www.arduinolibraries.info/ and https://platformio.org/
+- [o] Maybe use constructor-based initialization again?
+- [o] Unify critical sections / interrupt disabling between platforms?
   https://github.com/esp8266/Arduino/issues/2218
-- [] Would `delay(1)` be better than `delay(0)`?
-- [] Pulling all together
+- [o] Q: Would `delay(1)` be better than `delay(0)`?
+  A: even delay(0) will work. Should be as often as you can spare, but not more than 100ms let's say
+  -- https://github.com/esp8266/Arduino/issues/2240#issuecomment-230874704
+- [o] Pulling all together
   https://github.com/hiveeyes/HX711/tree/spring-cleaning
 
 
@@ -20,7 +22,7 @@
 ## ARM/SAMD
 
 ### Arduino Due
-- [] https://github.com/aguegu/ardulibs/issues/3
+- [o] https://github.com/aguegu/ardulibs/issues/3
 
 ### Teensy 3.x
 - [x] Thomas O Fredericks
