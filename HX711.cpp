@@ -15,7 +15,6 @@
 #endif
 
 #if defined(ESP8266) || defined(ESP32) || defined(ARDUINO_ARCH_SAMD)
-dscdc
 // Make shiftIn() be aware of clockspeed for ESP32, Teensy 3.x and friends
 // https://github.com/bogde/HX711/issues/75
 // https://github.com/arduino/Arduino/issues/6561
