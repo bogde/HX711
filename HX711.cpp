@@ -10,10 +10,17 @@
 #include <Arduino.h>
 #include <HX711.h>
 
+// TEENSYDUINO has a port of Dean Camera's ATOMIC_BLOCK macros for AVR to ARM Cortex M3.
+#define HAS_ATOMIC_BLOCK (defined(ARDUINO_ARCH_AVR) || defined(TEENSYDUINO))
+
+// Whether we are running on either the ESP8266 or the ESP32.
 #define ARCH_ESPRESSIF (defined(ARDUINO_ARCH_ESP8266) || defined(ARDUINO_ARCH_ESP32))
 
-// TEENSYDUINO has a port of Dean Camera's ATOMIC_BLOCK macros for AVR to ARM Cortex M3
-#define HAS_ATOMIC_BLOCK (defined(ARDUINO_ARCH_AVR) || defined(TEENSYDUINO))
+// Whether we are actually running on FreeRTOS.
+#define IS_FREE_RTOS defined(ARDUINO_ARCH_ESP32)
+
+// Define macro designating whether we're running on a reasonable
+// fast CPU and so should slow down sampling from GPIO.
 #define FAST_CPU \
     ( \
     ARCH_ESPRESSIF || \
@@ -22,13 +29,13 @@
     )
 
 #if HAS_ATOMIC_BLOCK
-// Acquire AVR-specific ATOMIC_BLOCK(ATOMIC_RESTORESTATE) macro
+// Acquire AVR-specific ATOMIC_BLOCK(ATOMIC_RESTORESTATE) macro.
 #include <util/atomic.h>
 #endif
 
 #if FAST_CPU
 // Make shiftIn() be aware of clockspeed for
-// faster CPUs like ESP32, Teensy 3.x and friends
+// faster CPUs like ESP32, Teensy 3.x and friends.
 // See also:
 // - https://github.com/bogde/HX711/issues/75
 // - https://github.com/arduino/Arduino/issues/6561
@@ -120,13 +127,8 @@ long HX711::read() {
 	// the sequence between `noInterrupts()` and `interrupts()` calls.
 	#if HAS_ATOMIC_BLOCK
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-	#endif
 
-	#ifdef ARDUINO_ARCH_ESP8266
-	noInterrupts();
-	#endif
-
-	#ifdef ARDUINO_ARCH_ESP32
+	#elif IS_FREE_RTOS
 	// Begin of critical section.
 	// Critical sections are used as a valid protection method
 	// against simultaneous access in vanilla FreeRTOS.
@@ -134,6 +136,12 @@ long HX711::read() {
 	// context switches and servicing of ISRs during a critical section.
 	portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 	portENTER_CRITICAL(&mux);
+
+	#else
+	// Disable interrupts.
+	noInterrupts();
+	#pragma warning( once : 4385 )
+
 	#endif
 
 	// pulse the clock pin 24 times to read the data
@@ -153,17 +161,16 @@ long HX711::read() {
 		#endif
 	}
 
-	#ifdef ARDUINO_ARCH_ESP32
+	#if IS_FREE_RTOS
 	// End of critical section.
 	portEXIT_CRITICAL(&mux);
-	#endif
 
-	#ifdef ARDUINO_ARCH_ESP8266
-	interrupts();
-	#endif
-
-	#if HAS_ATOMIC_BLOCK
+	#elif HAS_ATOMIC_BLOCK
 	}
+
+	#else
+	// Enable interrupts again.
+	interrupts();
 	#endif
 
 	// Replicate the most significant bit to pad out a 32-bit signed integer
