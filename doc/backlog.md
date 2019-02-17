@@ -11,6 +11,7 @@
   -- https://github.com/esp8266/Arduino/issues/2240#issuecomment-230874704
 - [o] Pulling all together
   https://github.com/hiveeyes/HX711/tree/spring-cleaning
+- [o] Drop a line at https://github.com/aguegu/ardulibs/issues/3 re. support for Arduino Due
 
 
 ## AVR
@@ -20,9 +21,6 @@
 
 
 ## ARM/SAMD
-
-### Arduino Due
-- [o] https://github.com/aguegu/ardulibs/issues/3
 
 ### Teensy 3.x
 - [x] Thomas O Fredericks
