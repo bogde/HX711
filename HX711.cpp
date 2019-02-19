@@ -101,13 +101,10 @@ void HX711::set_gain(byte gain) {
 
 long HX711::read() {
 
-	// Wait for the chip to become ready
-	while (!is_ready()) {
-		// Probably will do no harm on AVR but will feed the Watchdog Timer (WDT) on ESP.
-		// https://github.com/bogde/HX711/issues/73
-		delay(0);
-	}
+	// Wait for the chip to become ready.
+	wait_ready();
 
+	// Define structures for reading data into.
 	unsigned long value = 0;
 	uint8_t data[3] = { 0 };
 	uint8_t filler = 0x00;
@@ -142,12 +139,12 @@ long HX711::read() {
 	noInterrupts();
 	#endif
 
-	// pulse the clock pin 24 times to read the data
+	// Pulse the clock pin 24 times to read the data.
 	data[2] = SHIFTIN_WITH_SPEED_SUPPORT(DOUT, PD_SCK, MSBFIRST);
 	data[1] = SHIFTIN_WITH_SPEED_SUPPORT(DOUT, PD_SCK, MSBFIRST);
 	data[0] = SHIFTIN_WITH_SPEED_SUPPORT(DOUT, PD_SCK, MSBFIRST);
 
-	// set the channel and the gain factor for the next reading using the clock pin
+	// Set the channel and the gain factor for the next reading using the clock pin.
 	for (unsigned int i = 0; i < GAIN; i++) {
 		digitalWrite(PD_SCK, HIGH);
 		#if ARCH_ESPRESSIF
@@ -185,6 +182,45 @@ long HX711::read() {
 			| static_cast<unsigned long>(data[0]) );
 
 	return static_cast<long>(value);
+}
+
+void HX711::wait_ready(unsigned long delay_ms) {
+	// Wait for the chip to become ready.
+	// This is a blocking implementation and will
+	// halt the sketch until a load cell is connected.
+	while (!is_ready()) {
+		// Probably will do no harm on AVR but will feed the Watchdog Timer (WDT) on ESP.
+		// https://github.com/bogde/HX711/issues/73
+		delay(delay_ms);
+	}
+}
+
+bool HX711::wait_ready_retry(int retries, unsigned long delay_ms) {
+	// Wait for the chip to become ready by
+	// retrying for a specified amount of attempts.
+	// https://github.com/bogde/HX711/issues/76
+	int count = 0;
+	while (count < retries) {
+		if (is_ready()) {
+			return true;
+		}
+		delay(delay_ms);
+		count++;
+	}
+	return false;
+}
+
+bool HX711::wait_ready_timeout(unsigned long timeout, unsigned long delay_ms) {
+	// Wait for the chip to become ready until timeout.
+	// https://github.com/bogde/HX711/pull/96
+	unsigned long millisStarted = millis();
+	while (millis() - millisStarted < timeout) {
+		if (is_ready()) {
+			return true;
+		}
+		delay(delay_ms);
+	}
+	return false;
 }
 
 long HX711::read_average(byte times) {

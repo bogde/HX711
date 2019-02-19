@@ -37,6 +37,18 @@ Serial.print("Weight: ");
 Serial.println(loadcell.get_units(10), 2);
 ```
 
+For non-blocking mode, use:
+```
+// 4. Acquire reading without blocking
+if (scale.wait_ready_timeout(1000)) {
+    long reading = loadcell.get_units(10);
+    Serial.print("Weight: ");
+    Serial.println(reading, 2);
+} else {
+    Serial.println("HX711 not found.");
+}
+```
+
 
 ## Full example
 See `examples/hx711_example.ino` in this repository.
