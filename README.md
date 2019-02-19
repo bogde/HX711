@@ -55,15 +55,26 @@ See `examples` directory in this repository.
 
 
 ## HAL support
-- [Arduino AVR core](https://github.com/arduino/ArduinoCore-avr) (untested)
-- [Arduino core for ESP8266](https://github.com/esp8266/Arduino) (untested)
-- [Arduino core for ESP32](https://github.com/espressif/arduino-esp32) (untested)
-- [Arduino core for SAMD21](https://github.com/arduino/ArduinoCore-samd) (untested)
-- [Arduino core for SAMD21 and SAMD51](https://github.com/adafruit/ArduinoCore-samd) (untested)
-- [Arduino core for STM32](https://github.com/stm32duino/Arduino_Core_STM32) (untested)
+- [Arduino AVR core](https://github.com/arduino/ArduinoCore-avr)
+- [Arduino core for ESP8266](https://github.com/esp8266/Arduino)
+- [Arduino core for ESP32](https://github.com/espressif/arduino-esp32)
+- [Arduino core for SAMD21](https://github.com/arduino/ArduinoCore-samd)
+- [Arduino core for SAMD51](https://github.com/adafruit/ArduinoCore-samd) (untested)
+- [Arduino core for STM32](https://github.com/stm32duino/Arduino_Core_STM32)
 
-Please note this revamped library has not been tested on real hardware yet.
-However, compilation of all environments defined in `platformio.ini` succeeds.
+
+## Hardware support
+The library has been tested successfully on the following hardware. Thanks, Bogdan!
+- Arduino Uno ([ATmega328])
+- WeMos D1 mini ([ESP8266])
+- ESP32 DEVKIT V1 ([ESP32])
+- STM32F103C8T6 STM32 Blue Pill Board ([STM32 F1], [Cortex-M3])
+
+[ATmega328]: https://en.wikipedia.org/wiki/ATmega328
+[ESP8266]: https://en.wikipedia.org/wiki/ESP8266
+[ESP32]: https://en.wikipedia.org/wiki/ESP32
+[STM32 F1]: https://en.wikipedia.org/wiki/STM32#STM32_F1
+[Cortex-M3]: https://en.wikipedia.org/wiki/ARM_Cortex-M#Cortex-M3
 
 
 ## Features
