@@ -50,8 +50,8 @@ if (scale.wait_ready_timeout(1000)) {
 ```
 
 
-## Full example
-See `examples/hx711_example.ino` in this repository.
+## More examples
+See `examples` directory in this repository.
 
 
 ## HAL support

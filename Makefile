@@ -57,3 +57,6 @@ ci-all: install-platformio
 
 ci-basic:
 	$(platformio) ci --board=$(board) --lib="." examples/HX711_basic_example --verbose
+
+clean:
+	platformio run -t clean
