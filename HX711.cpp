@@ -140,8 +140,6 @@ long HX711::read() {
 	#else
 	// Disable interrupts.
 	noInterrupts();
-	#pragma warning( once : 4385 )
-
 	#endif
 
 	// pulse the clock pin 24 times to read the data
