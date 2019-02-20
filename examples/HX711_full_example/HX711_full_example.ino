@@ -7,22 +7,13 @@
  * (c) 2018 Bogdan Necula
  *
 **/
-
-/**
- *
- * Pin definition examples
- *
- * AVR and friends
- * HX711.DOUT	- pin #A1
- * HX711.PD_SCK - pin #A0
- *
- * ESP and friends
- * HX711.DOUT	- pin #D2
- * HX711.PD_SCK - pin #D3
- *
-**/
-
 #include "HX711.h"
+
+
+// HX711 circuit wiring
+const int LOADCELL_DOUT_PIN = 2;
+const int LOADCELL_SCK_PIN = 3;
+
 
 HX711 scale;
 
@@ -38,7 +29,7 @@ void setup() {
   // - With a gain factor of 32, channel B is selected
   // By omitting the gain factor parameter, the library
   // default "128" (Channel A) is used here.
-  scale.begin(A1, A0);
+  scale.begin(LOADCELL_DOUT_PIN, LOADCELL_SCK_PIN);
 
   Serial.println("Before setting up the scale:");
   Serial.print("read: \t\t");

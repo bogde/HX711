@@ -13,15 +13,9 @@ It supports the platforms `atmelavr`, `espressif8266`, `espressif32`,
 #include "HX711.h"
 HX711 loadcell;
 
-// 1. Loadcell settings
-
-// AVR and friends
-const int LOADCELL_DOUT_PIN = A1;
-const int LOADCELL_SCK_PIN = A0;
-
-// ESP and friends
-const int LOADCELL_DOUT_PIN = D2;
-const int LOADCELL_SCK_PIN = D3;
+// 1. HX711 circuit wiring
+const int LOADCELL_DOUT_PIN = 2;
+const int LOADCELL_SCK_PIN = 3;
 
 // 2. Adjustment settings
 const long LOADCELL_OFFSET = 50682624;
