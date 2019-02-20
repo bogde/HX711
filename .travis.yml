@@ -8,12 +8,10 @@ cache:
     directories:
         - "~/.platformio"
 
-env:
-    - PLATFORMIO_CI_SRC=examples/HX711Serial
-    - PLATFORMIO_CI_SRC=examples/HX711SerialBegin
-
 install:
     - pip install -U platformio
 
 script:
-    - platformio ci --board=megaatmega2560 --lib="."
+    - platformio ci --board=megaatmega2560 --lib="." examples/HX711_full_example
+    - platformio ci --board=megaatmega2560 --lib="." examples/HX711_timeout_example
+    - platformio run

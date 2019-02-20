@@ -1,15 +1,35 @@
+/**
+ *
+ * HX711 library for Arduino - example file
+ * https://github.com/bogde/HX711
+ *
+ * MIT License
+ * (c) 2018 Bogdan Necula
+ *
+**/
 #include "HX711.h"
 
-// HX711.DOUT	- pin #D2
-// HX711.PD_SCK	- pin #D3
 
-HX711 scale(D2, D3);		// parameter "gain" is ommited; the default value 128 is used by the library
+// HX711 circuit wiring
+const int LOADCELL_DOUT_PIN = 2;
+const int LOADCELL_SCK_PIN = 3;
+
+
+HX711 scale;
 
 void setup() {
   Serial.begin(38400);
-  // usually the begin method is called by the class builder but in case of esp8266 must be called explicitly in the setup
-  scale.begin(D2,D3); //esp specific statment 
   Serial.println("HX711 Demo");
+
+  Serial.println("Initializing the scale");
+
+  // Initialize library with data output pin, clock input pin and gain factor.
+  // Channel selection is made by passing the appropriate gain:
+  // - With a gain factor of 64 or 128, channel A is selected
+  // - With a gain factor of 32, channel B is selected
+  // By omitting the gain factor parameter, the library
+  // default "128" (Channel A) is used here.
+  scale.begin(LOADCELL_DOUT_PIN, LOADCELL_SCK_PIN);
 
   Serial.println("Before setting up the scale:");
   Serial.print("read: \t\t");
@@ -22,8 +42,8 @@ void setup() {
   Serial.println(scale.get_value(5));		// print the average of 5 readings from the ADC minus the tare weight (not set yet)
 
   Serial.print("get units: \t\t");
-  Serial.println(scale.get_units(5), 1);	// print the average of 5 readings from the ADC minus tare weight (not set) divided 
-						// by the SCALE parameter (not set yet)  
+  Serial.println(scale.get_units(5), 1);	// print the average of 5 readings from the ADC minus tare weight (not set) divided
+						// by the SCALE parameter (not set yet)
 
   scale.set_scale(2280.f);                      // this value is obtained by calibrating the scale with known weights; see the README for details
   scale.tare();				        // reset the scale to 0
@@ -40,7 +60,7 @@ void setup() {
   Serial.println(scale.get_value(5));		// print the average of 5 readings from the ADC minus the tare weight, set with tare()
 
   Serial.print("get units: \t\t");
-  Serial.println(scale.get_units(5), 1);        // print the average of 5 readings from the ADC minus tare weight, divided 
+  Serial.println(scale.get_units(5), 1);        // print the average of 5 readings from the ADC minus tare weight, divided
 						// by the SCALE parameter set with set_scale
 
   Serial.println("Readings:");

@@ -6,12 +6,15 @@
         "type": "git",
         "url": "https://github.com/bogde/HX711.git"
     },
-    "version": "0.1",
+    "version": "0.7.1",
     "exclude": "tests",
     "examples": "examples/*/*.ino",
     "frameworks": "arduino",
     "platforms": [
         "atmelavr",
-        "espressif"
+        "espressif8266",
+        "espressif32",
+        "atmelsam",
+        "ststm32"
     ]
 }
