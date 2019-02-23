@@ -1,14 +1,20 @@
 # HX711
-An Arduino library to interface the [Avia Semiconductor HX711 24-Bit Analog-to-Digital Converter (ADC)] for Weight Scales.
+An Arduino library to interface the [Avia Semiconductor HX711 24-Bit Analog-to-Digital Converter (ADC)]
+for reading load cells / weight scales.
 
-It supports the platforms `atmelavr`, `espressif8266`, `espressif32`,
-`atmelsam` and `ststm32` by corresponding [PlatformIO] build environments.
+It supports the architectures `atmelavr`, `espressif8266`, `espressif32`,
+`atmelsam`, `teensy` and `ststm32` by corresponding [PlatformIO] targets.
 
 [Avia Semiconductor HX711 24-Bit Analog-to-Digital Converter (ADC)]: http://www.dfrobot.com/image/data/SEN0160/hx711_english.pdf
 [PlatformIO]: https://platformio.org/
 
 
 ## Synopsis
+
+### Blocking mode
+The library is usually used in blocking mode, i.e. it will wait for the
+hardware becoming available before returning a reading.
+
 ```c++
 #include "HX711.h"
 HX711 loadcell;
@@ -31,7 +37,10 @@ Serial.print("Weight: ");
 Serial.println(loadcell.get_units(10), 2);
 ```
 
-For non-blocking mode, use:
+### Non-blocking mode
+It is also possible to define a maximum timeout to wait for the hardware
+to be initialized. This won't send the program into a spinlock when the
+scale is disconnected and will probably also account for hardware failures.
 ```
 // 4. Acquire reading without blocking
 if (scale.wait_ready_timeout(1000)) {
@@ -113,19 +122,12 @@ The library has been tested successfully on the following hardware. Thanks, Bogd
 5. Adjust the parameter in step 4 until you get an accurate reading.
 
 
-## Deprecation warning
-This library received some spring-cleaning in February 2019, removing
-the pin definition within the constructor completely, as this was not
-timing safe. (#29) Please use the new initialization flavor as outlined
-in the example above.
-
-
 ## Build
 
 ### All architectures
 This will spawn a Python virtualenv in the current directory,
-install `platformio` into it and then execute `platformio run`.
-effectively running all targets defined in `platformio.ini`.
+install `platformio` into it and then execute `platformio run`,
+effectively building for all environments defined in `platformio.ini`.
 
     make build-all
 
@@ -147,13 +149,22 @@ Environment bluepill   	[SUCCESS]
 https://gist.github.com/amotl/5ed6b3eb1fcd2bc78552b218b426f6aa
 
 
-### Specific environment
+### Specific architecture
+You can run a build for a specific architecture by specifying
+the appropriate platform label on the command line.
 
     # Build for LoPy4
     make build-env environment=lopy4
 
     # Build for Feather M0
     make build-env environment=feather_m0
+
+
+## Deprecation warning
+This library received some spring-cleaning in February 2019 (#123),
+removing the pin definition within the constructor completely, as
+this was not timing safe. (#29) Please use the new initialization
+flavor as outlined in the example above.
 
 
 ## Credits
@@ -164,14 +175,30 @@ who took over in 2014 and last but not least all others who contributed to this
 library over the course of the last years, see also `CONTRIBUTORS.rst` in this
 repository.
 
-### See also
+#### See also
 - https://item.taobao.com/item.htm?id=18121631630
 - https://item.taobao.com/item.htm?id=544769386300
 
 
 ## Similar libraries
-
 There are other libraries around, enjoy:
 
 - https://github.com/olkal/HX711_ADC
 - https://github.com/queuetue/Q2-HX711-Arduino-Library
+
+
+---
+
+## Appendix
+
+### Considerations about real world effects caused by physics
+You should consider getting into the details of strain-gauge load cell
+sensors when expecting reasonable results. The range of topics is from
+sufficient and stable power supply, using the proper excitation voltage
+to the Seebeck effect and temperature compensation.
+
+See also:
+- [Overview about real world effects](https://community.hiveeyes.org/t/analog-vs-digital-signal-gain-amplifiers/380/6)
+- [Thermoelectric effect](https://en.wikipedia.org/wiki/Thermoelectric_effect) (Seebeck effect)
+- Temperature compensation: [Resource collection](https://community.hiveeyes.org/t/temperaturkompensation-fur-waage-hardware-firmware/115), [DIY research](https://community.hiveeyes.org/t/temperaturkompensation-fur-waage-notig-datensammlung/245)
+- [Power management for HX711](https://community.hiveeyes.org/t/stromversorgung-hx711/893)
