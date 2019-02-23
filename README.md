@@ -67,11 +67,14 @@ See `examples` directory in this repository.
 
 
 ## Hardware support
-The library has been tested successfully on the following hardware. Thanks, Bogdan!
-- Arduino Uno ([ATmega328])
-- WeMos D1 mini ([ESP8266])
-- ESP32 DEVKIT V1 ([ESP32])
-- STM32F103C8T6 STM32 Blue Pill Board ([STM32 F1], [Cortex-M3])
+The library has been tested successfully on the following hardware.
+
+- [ATmega328]: Arduino Uno
+- [ESP8266]: WeMos D1 mini, Adafruit HUZZAH
+- [ESP32]: ESP32 DEVKIT V1, Heltec WiFi Kit 32, Adafruit Feather HUZZAH32
+- [STM32 F1] ([Cortex-M3]): STM32F103C8T6 STM32 Blue Pill Board
+
+Thanks, @bogde and @ClemensGruber!
 
 [ATmega328]: https://en.wikipedia.org/wiki/ATmega328
 [ESP8266]: https://en.wikipedia.org/wiki/ESP8266
