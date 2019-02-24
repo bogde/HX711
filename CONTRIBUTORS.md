@@ -12,8 +12,8 @@ Listed in the order of appearance.
 - Geert Roumen et al.: ESP32 support
 - Thomas O Fredericks: Support for Teensy 3.2 and non-blocking readings
 - Ahmad Elbadri: Improve ESP8266 stability
-- Andreas Motl: Bookkeeping, multiarch support
-- The Hiveeyes Developers: Spring-cleaning 2019
+- Andreas Motl: Spring cleaning, multiarch support
+- Clemens Gruber: Hardware testing
 - Many bits and pieces by countless people from the community,
   see also "doc/backlog.rst" in the repository.
 
