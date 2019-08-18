@@ -43,7 +43,7 @@ to be initialized. This won't send the program into a spinlock when the
 scale is disconnected and will probably also account for hardware failures.
 ```
 // 4. Acquire reading without blocking
-if (scale.wait_ready_timeout(1000)) {
+if (loadcell.wait_ready_timeout(1000)) {
     long reading = loadcell.get_units(10);
     Serial.print("Weight: ");
     Serial.println(reading, 2);
