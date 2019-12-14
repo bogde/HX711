@@ -45,7 +45,7 @@ class HX711
 
 		// Wait for the HX711 to become ready
 		void wait_ready(unsigned long delay_ms = 0);
-		bool wait_ready_retry(int retries = 3, unsigned long delay_ms = 0);
+		bool wait_ready_retry(int retries = 100, unsigned long delay_ms = 5);
 		bool wait_ready_timeout(unsigned long timeout = 1000, unsigned long delay_ms = 0);
 
 		// set the gain factor; takes effect only after a call to read()
