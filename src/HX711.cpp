@@ -176,8 +176,8 @@ long HX711::read() {
 	}
 
 	// Construct a 32-bit signed integer
-	value = ( static_cast<unsigned long>(filler) << 24
-			| static_cast<unsigned long>(data[2]) << 16
+	value = ( static_cast<unsigned long>(data[2]) << 24
+			| static_cast<unsigned long>(filler) << 16
 			| static_cast<unsigned long>(data[1]) << 8
 			| static_cast<unsigned long>(data[0]) );
 
