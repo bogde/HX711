@@ -103,6 +103,7 @@ long HX711::read() {
 
 	// Wait for the chip to become ready.
   if ( !wait_ready_retry() ){
+    Serial.println("HX711:wait_ready_retry:Counted out while waiting for is_ready");
     return 0;
   }
 
@@ -225,9 +226,9 @@ bool HX711::wait_ready_timeout(unsigned long timeout, unsigned long delay_ms) {
 	return false;
 }
 
-long HX711::read_average(byte times) {
+long HX711::read_average(int times) {
 	long sum = 0;
-	for (byte i = 0; i < times; i++) {
+	for (int i = 0; i < times; i++) {
 		sum += read();
 		// Probably will do no harm on AVR but will feed the Watchdog Timer (WDT) on ESP.
 		// https://github.com/bogde/HX711/issues/73
@@ -236,15 +237,15 @@ long HX711::read_average(byte times) {
 	return sum / times;
 }
 
-double HX711::get_value(byte times) {
+double HX711::get_value(int times) {
 	return read_average(times) - OFFSET;
 }
 
-float HX711::get_units(byte times) {
+float HX711::get_units(int times) {
 	return get_value(times) / SCALE;
 }
 
-void HX711::tare(byte times) {
+void HX711::tare(int times) {
 	double sum = read_average(times);
 	set_offset(sum);
 }
