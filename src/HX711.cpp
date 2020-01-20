@@ -101,12 +101,6 @@ void HX711::set_gain(byte gain) {
 
 long HX711::read() {
 
-	// Wait for the chip to become ready.
-  if ( !wait_ready_retry() ){
-    Serial.println("HX711:wait_ready_retry:Counted out while waiting for is_ready");
-    return 0;
-  }
-
 	// Define structures for reading data into.
 	unsigned long value = 0;
 	uint8_t data[3] = { 0 };
@@ -125,6 +119,9 @@ long HX711::read() {
 	// state after the sequence completes, insuring that the entire read-and-gain-set
 	// sequence is not interrupted.  The macro has a few minor advantages over bracketing
 	// the sequence between `noInterrupts()` and `interrupts()` calls.
+	// Running without interrupts kills the millis() and micros() function because it disables 
+	// Timer0 overflow interrupts, so any other time estimation is messed up. 
+
 	#if HAS_ATOMIC_BLOCK
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
 
@@ -141,6 +138,12 @@ long HX711::read() {
 	// Disable interrupts.
 	noInterrupts();
 	#endif
+	
+		// Wait for the chip to become ready.
+  if ( !wait_ready_safe() ){
+    Serial.println("HX711:wait_ready_safe:Counted out while waiting for is_ready");
+    return 0;
+  }
 
 	// Pulse the clock pin 24 times to read the data.
 	data[2] = SHIFTIN_WITH_SPEED_SUPPORT(DOUT, PD_SCK, MSBFIRST);
@@ -224,6 +227,25 @@ bool HX711::wait_ready_timeout(unsigned long timeout, unsigned long delay_ms) {
 		delay(delay_ms);
 	}
 	return false;
+}
+
+bool HX711::wait_ready_safe(int retries) {
+	// Wait for the chip to become ready and sync with conversion cycle.
+	// Occasionally the HX711 would return an incorrect reading with a value much higher than expected.
+	// The theory is that there is a race condition between the firmware detecting is_ready() 
+	// and the HX711 starting a new conversion cycle after the firmware staring the shift out. 
+	// To prevent this, this function first detects a conversion happening from the HX711, and then
+	// returns soon after the falling edge. 
+	// This function may take up to one conversion cycle to return (100 ms at 10 SPS or ~11 ms at 80 SPS)
+	// In practice, it was clocked in an Arduino MEGA 2560 to talke less than 1200 micros. 
+	// - This could be off by a factor of 10 due to other code that could mess with the timers. 
+  unsigned long n=0;
+  while ( is_ready() && (n++ < retries) ){;} // Wait for conversion start. 
+  if ( n > retries){
+    Serial.println("wait_ready_safe:Counted out");
+	  return false;
+	}
+	return wait_ready_retry( retries );
 }
 
 long HX711::read_average(int times) {
