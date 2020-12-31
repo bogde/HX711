@@ -73,7 +73,7 @@ void HX711::begin(byte dout, byte pd_sck, byte gain) {
 	DOUT = dout;
 
 	pinMode(PD_SCK, OUTPUT);
-	pinMode(DOUT, INPUT_PULLUP);
+	pinMode(DOUT, INPUT);
 
 	set_gain(gain);
 }
