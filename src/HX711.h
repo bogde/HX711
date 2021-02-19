@@ -24,6 +24,7 @@ class HX711
 		byte GAIN;		// amplification factor
 		long OFFSET = 0;	// used for tare weight
 		float SCALE = 1;	// used to return weight in grams, kg, ounces, whatever
+		float TC = 0;	// used to compensate for temperature changes
 
 	public:
 
@@ -74,6 +75,12 @@ class HX711
 
 		// get the current SCALE
 		float get_scale();
+		
+		// set the TC value; this value is used to compensate for temperature changes
+		void set_tc(float tc = 0.f);
+
+		// get the current TC
+		float get_tc();
 
 		// set OFFSET, the value that's subtracted from the actual reading (tare weight)
 		void set_offset(long offset = 0);

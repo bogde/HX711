@@ -257,6 +257,14 @@ float HX711::get_scale() {
 	return SCALE;
 }
 
+void HX711::set_tc(float tc) {
+	TC = tc;
+}
+
+float HX711::get_tc() {
+	return TC;
+}
+
 void HX711::set_offset(long offset) {
 	OFFSET = offset;
 }
