@@ -139,16 +139,17 @@ effectively building for all environments defined in `platformio.ini`.
 
 #### Result
 ```
-Environment feather_328	[SUCCESS]
-Environment atmega_2560	[SUCCESS]
-Environment huzzah     	[SUCCESS]
-Environment lopy4      	[SUCCESS]
-Environment teensy31   	[SUCCESS]
-Environment teensy36   	[SUCCESS]
-Environment feather_m0 	[SUCCESS]
-Environment arduino_due	[SUCCESS]
-Environment feather_m4 	[SUCCESS]
-Environment bluepill   	[SUCCESS]
+Environment feather_328                 [SUCCESS]
+Environment atmega_2560	                [SUCCESS]
+Environment huzzah                      [SUCCESS]
+Environment lopy4                       [SUCCESS]
+Environment teensy31                    [SUCCESS]
+Environment teensy36                    [SUCCESS]
+Environment feather_m0                  [SUCCESS]
+Environment arduino_due                 [SUCCESS]
+Environment feather_m4                  [SUCCESS]
+Environment bluepill   	                [SUCCESS]
+Environment adafruit_feather_nrf52840   [SUCCESS]
 ```
 
 #### Details
