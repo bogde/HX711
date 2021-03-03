@@ -14,7 +14,7 @@ $(eval platformio   := $(venvpath)/bin/platformio)
 
 # Setup Python virtualenv
 setup-virtualenv:
-	@test -e $(python) || `command -v virtualenv` --python=python2 --no-site-packages $(venvpath)
+	@test -e $(python) || `command -v virtualenv` --python=python3 $(venvpath)
 
 
 # ----------
