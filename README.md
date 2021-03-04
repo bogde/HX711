@@ -53,6 +53,10 @@ if (loadcell.wait_ready_timeout(1000)) {
 ```
 
 
+## FAQ
+https://github.com/bogde/HX711/blob/master/doc/faq.md
+
+
 ## More examples
 See `examples` directory in this repository.
 
