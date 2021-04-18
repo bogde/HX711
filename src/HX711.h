@@ -24,6 +24,7 @@ class HX711
 		byte GAIN;		// amplification factor
 		long OFFSET = 0;	// used for tare weight
 		float SCALE = 1;	// used to return weight in grams, kg, ounces, whatever
+		float TC = 0;	// used to compensate for temperature changes
 
 	public:
 
@@ -45,8 +46,9 @@ class HX711
 
 		// Wait for the HX711 to become ready
 		void wait_ready(unsigned long delay_ms = 0);
-		bool wait_ready_retry(int retries = 3, unsigned long delay_ms = 0);
+		bool wait_ready_retry(int retries = 6000, unsigned long delay_ms = 0);
 		bool wait_ready_timeout(unsigned long timeout = 1000, unsigned long delay_ms = 0);
+		bool wait_ready_safe(int retries = 6000);
 
 		// set the gain factor; takes effect only after a call to read()
 		// channel A can be set for a 128 or 64 gain; channel B has a fixed 32 gain
@@ -57,23 +59,29 @@ class HX711
 		long read();
 
 		// returns an average reading; times = how many times to read
-		long read_average(byte times = 10);
+		long read_average(int times = 10);
 
 		// returns (read_average() - OFFSET), that is the current value without the tare weight; times = how many readings to do
-		double get_value(byte times = 1);
+		double get_value(int times = 1);
 
 		// returns get_value() divided by SCALE, that is the raw value divided by a value obtained via calibration
 		// times = how many readings to do
-		float get_units(byte times = 1);
+		float get_units(int times = 1);
 
 		// set the OFFSET value for tare weight; times = how many times to read the tare value
-		void tare(byte times = 10);
+		void tare(int times = 10);
 
 		// set the SCALE value; this value is used to convert the raw data to "human readable" data (measure units)
 		void set_scale(float scale = 1.f);
 
 		// get the current SCALE
 		float get_scale();
+		
+		// set the TC value; this value is used to compensate for temperature changes
+		void set_tc(float tc = 0.f);
+
+		// get the current TC
+		float get_tc();
 
 		// set OFFSET, the value that's subtracted from the actual reading (tare weight)
 		void set_offset(long offset = 0);
