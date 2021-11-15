@@ -61,6 +61,13 @@ uint8_t shiftInSlow(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder) {
 #define SHIFTIN_WITH_SPEED_SUPPORT(data,clock,order) shiftIn(data,clock,order)
 #endif
 
+#ifdef ARCH_ESPRESSIF
+// ESP8266 doesn't read values between 0x20000 and 0x30000 when DOUT is pulled up.
+#define DOUT_MODE INPUT
+#else
+#define DOUT_MODE INPUT_PULLUP
+#endif
+
 
 HX711::HX711() {
 }
@@ -73,7 +80,7 @@ void HX711::begin(byte dout, byte pd_sck, byte gain) {
 	DOUT = dout;
 
 	pinMode(PD_SCK, OUTPUT);
-	pinMode(DOUT, INPUT_PULLUP);
+	pinMode(DOUT, DOUT_MODE);
 
 	set_gain(gain);
 }
