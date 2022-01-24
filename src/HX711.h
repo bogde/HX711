@@ -23,7 +23,7 @@ class HX711
 		byte DOUT;		// Serial Data Output Pin
 		byte GAIN;		// amplification factor
 		long OFFSET = 0;	// used for tare weight
-		float SCALE = 1;	// used to return weight in grams, kg, ounces, whatever
+		float SCALE = 1.f;	// used to return weight in grams, kg, ounces, whatever
 
 	public:
 
@@ -54,7 +54,7 @@ class HX711
 		void set_gain(byte gain = 128);
 
 		// waits for the chip to be ready and returns a reading
-		long read();
+		long read(unsigned long timeout = 1000);
 
 		// returns an average reading; times = how many times to read
 		long read_average(byte times = 10);
