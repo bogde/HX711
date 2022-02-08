@@ -47,11 +47,11 @@ uint8_t shiftInSlow(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder) {
     for(i = 0; i < 8; ++i) {
         digitalWrite(clockPin, HIGH);
         delayMicroseconds(1);
+        digitalWrite(clockPin, LOW);
         if(bitOrder == LSBFIRST)
             value |= digitalRead(dataPin) << i;
         else
             value |= digitalRead(dataPin) << (7 - i);
-        digitalWrite(clockPin, LOW);
         delayMicroseconds(1);
     }
     return value;
