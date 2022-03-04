@@ -72,6 +72,9 @@ class HX711
 		// set the SCALE value; this value is used to convert the raw data to "human readable" data (measure units)
 		void set_scale(float scale = 1.f);
 
+		// get the current GAIN
+		byte get_gain();
+
 		// get the current SCALE
 		float get_scale();
 
