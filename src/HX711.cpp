@@ -106,9 +106,6 @@ void HX711::set_gain(byte gain) {
 
 long HX711::read() {
 
-	// Wait for the chip to become ready.
-	wait_ready();
-
 	// Define structures for reading data into.
 	unsigned long value = 0;
 	uint8_t data[3] = { 0 };
@@ -127,6 +124,9 @@ long HX711::read() {
 	// state after the sequence completes, insuring that the entire read-and-gain-set
 	// sequence is not interrupted.  The macro has a few minor advantages over bracketing
 	// the sequence between `noInterrupts()` and `interrupts()` calls.
+	// Running without interrupts kills the millis() and micros() function because it disables
+	// Timer0 overflow interrupts, so any other time estimation is messed up.
+
 	#if HAS_ATOMIC_BLOCK
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
 
@@ -143,6 +143,12 @@ long HX711::read() {
 	// Disable interrupts.
 	noInterrupts();
 	#endif
+
+		// Wait for the chip to become ready.
+  if ( !wait_ready_safe() ){
+    Serial.println("HX711:wait_ready_safe:Counted out while waiting for is_ready");
+    return 0;
+  }
 
 	// Pulse the clock pin 24 times to read the data.
 	data[2] = SHIFTIN_WITH_SPEED_SUPPORT(DOUT, PD_SCK, MSBFIRST);
@@ -228,9 +234,28 @@ bool HX711::wait_ready_timeout(unsigned long timeout, unsigned long delay_ms) {
 	return false;
 }
 
-long HX711::read_average(byte times) {
+bool HX711::wait_ready_safe(int retries) {
+	// Wait for the chip to become ready and sync with conversion cycle.
+	// Occasionally the HX711 would return an incorrect reading with a value much higher than expected.
+	// The theory is that there is a race condition between the firmware detecting is_ready()
+	// and the HX711 starting a new conversion cycle after the firmware staring the shift out.
+	// To prevent this, this function first detects a conversion happening from the HX711, and then
+	// returns soon after the falling edge.
+	// This function may take up to one conversion cycle to return (100 ms at 10 SPS or ~11 ms at 80 SPS)
+	// In practice, it was clocked in an Arduino MEGA 2560 to talke less than 1200 micros.
+	// - This could be off by a factor of 10 due to other code that could mess with the timers.
+  int n = 0;
+  while ( is_ready() && (n++ < retries) ){;} // Wait for conversion start.
+  if ( n > retries){
+    Serial.println("wait_ready_safe:Counted out");
+	  return false;
+	}
+	return wait_ready_retry( retries );
+}
+
+long HX711::read_average(int times) {
 	long sum = 0;
-	for (byte i = 0; i < times; i++) {
+	for (int i = 0; i < times; i++) {
 		sum += read();
 		// Probably will do no harm on AVR but will feed the Watchdog Timer (WDT) on ESP.
 		// https://github.com/bogde/HX711/issues/73
@@ -239,15 +264,15 @@ long HX711::read_average(byte times) {
 	return sum / times;
 }
 
-double HX711::get_value(byte times) {
+double HX711::get_value(int times) {
 	return read_average(times) - OFFSET;
 }
 
-float HX711::get_units(byte times) {
+float HX711::get_units(int times) {
 	return get_value(times) / SCALE;
 }
 
-void HX711::tare(byte times) {
+void HX711::tare(int times) {
 	double sum = read_average(times);
 	set_offset(sum);
 }
@@ -258,6 +283,14 @@ void HX711::set_scale(float scale) {
 
 float HX711::get_scale() {
 	return SCALE;
+}
+
+void HX711::set_tc(float tc) {
+	TC = tc;
+}
+
+float HX711::get_tc() {
+	return TC;
 }
 
 void HX711::set_offset(long offset) {
