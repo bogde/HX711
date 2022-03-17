@@ -256,6 +256,10 @@ void HX711::set_scale(float scale) {
 	SCALE = scale;
 }
 
+byte HX711::get_gain() {
+	return GAIN;
+}
+
 float HX711::get_scale() {
 	return SCALE;
 }
