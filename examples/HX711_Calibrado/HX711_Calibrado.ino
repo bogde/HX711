@@ -68,12 +68,12 @@ void calibrate()
         Serial.read();
     balanza.set_scale();
     balanza.tare();
-    Serial.println("\nPut 2800 gr in scale, press a key to continue");
+    Serial.println("\nPut 1000 gr in scale, press a key to continue");
     while (!Serial.available())
         ;
     while (Serial.available())
         Serial.read();
-    balanza.set_scale(balanza.get_units(15) / 2800);
+    balanza.set_scale(balanza.get_units(15) / 1000);
     balanza.set_offset(balanza.get_value(15));
     Serial.println("\nScale is calibrated,clean the scale Scale is calibrated, press a key to continue");
     balanza.tare(15);
