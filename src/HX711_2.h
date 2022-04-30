@@ -20,6 +20,7 @@ class HX711_2
 {
 	private:
 		byte PD_SCK;	// Power Down and Serial Clock Input Pin
+		byte PD_SCK2;	// Power Down and Serial Clock Input Pin
 		byte DOUT;		// Serial Data Output Pin
 		byte DOUT2;		// Serial Data Output Pin
 		byte GAIN;		// amplification factor
@@ -39,7 +40,7 @@ class HX711_2
 		// - With a gain factor of 64 or 128, channel A is selected
 		// - With a gain factor of 32, channel B is selected
 		// The library default is "128" (Channel A).
-		void begin(byte dout, byte dout2, byte pd_sck, byte gain = 128);
+		void begin(byte dout, byte dout2, byte pd_sck, byte pd_sck2 = 255, byte gain = 128);
 
 		// Check if HX711 is ready
 		// from the datasheet: When output data is not ready for retrieval, digital output pin DOUT is high. Serial clock
@@ -66,7 +67,7 @@ class HX711_2
 		void get_value(long* readValues, byte times = 1);
 
 		// returns get_value() divided by SCALE, that is the raw value divided by a value obtained via calibration
-		// times = how many readings to do  
+		// times = how many readings to do
 		void get_units(float* readValues, byte times = 1);
 
 		// set the OFFSET value for tare weight; times = how many times to read the tare value
