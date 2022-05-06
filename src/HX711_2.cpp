@@ -60,7 +60,7 @@ uint16_t shiftInSlow(uint8_t dataPin, uint8_t dataPin2, uint8_t clockPin, uint8_
 }
 
 
-#ifdef ARCH_ESPRESSIF
+#if ARCH_ESPRESSIF
 // ESP8266 doesn't read values between 0x20000 and 0x30000 when DOUT is pulled up.
 #define DOUT_MODE INPUT
 #else
