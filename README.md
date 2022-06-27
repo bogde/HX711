@@ -196,6 +196,7 @@ There are other libraries around, enjoy:
 
 - https://github.com/olkal/HX711_ADC
 - https://github.com/queuetue/Q2-HX711-Arduino-Library
+- https://github.com/sparkfun/HX711-Load-Cell-Amplifier
 
 
 ---
