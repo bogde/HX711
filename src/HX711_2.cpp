@@ -32,6 +32,9 @@
 #include <util/atomic.h>
 #endif
 
+// Defines the delay(us) between setting the HIGH/LOW modes of the clock pins
+#define DELAY_MICROSECONDS 3
+
 static inline void doubleWrite(uint8_t pin1, uint8_t pin2, bool level)
 {
   digitalWrite(pin1, level);
@@ -48,9 +51,9 @@ uint16_t shiftInSlow(uint8_t dataPin, uint8_t dataPin2, uint8_t clockPin, uint8_
   for (i = 0; i < 8; ++i)
   {
     doubleWrite(clockPin, clockPin2, HIGH);
-    delayMicroseconds(1);
+    delayMicroseconds(DELAY_MICROSECONDS);
     doubleWrite(clockPin, clockPin2, LOW);
-    delayMicroseconds(1);
+    delayMicroseconds(DELAY_MICROSECONDS);
     if (bitOrder == LSBFIRST)
     {
       value |= digitalRead(dataPin) << i;
@@ -81,16 +84,16 @@ HX711_2::~HX711_2()
 {
 }
 
-void HX711_2::begin(byte dout, byte dout2, byte pd_sck, byte pd_sck2, byte gain)
+void HX711_2::begin(byte dout, byte dout2, byte pd_sck, byte pd_sck2, byte gain, unsigned char sck_mode)
 {
   PD_SCK = pd_sck;
   PD_SCK2 = pd_sck2;
   DOUT = dout;
   DOUT2 = dout2;
 
-  pinMode(PD_SCK, OUTPUT);
+  pinMode(PD_SCK, sck_mode);
   if (PD_SCK2 != 255)
-    pinMode(PD_SCK2, OUTPUT);
+    pinMode(PD_SCK2, sck_mode);
   pinMode(DOUT, DOUT_MODE);
   pinMode(DOUT2, DOUT_MODE);
 
@@ -184,11 +187,11 @@ void HX711_2::read(long *readValues, unsigned long timeout)
     {
       doubleWrite(PD_SCK, PD_SCK2, HIGH);
 #if FAST_CPU
-      delayMicroseconds(1);
+      delayMicroseconds(DELAY_MICROSECONDS);
 #endif
       doubleWrite(PD_SCK, PD_SCK2, LOW);
 #if FAST_CPU
-      delayMicroseconds(1);
+      delayMicroseconds(DELAY_MICROSECONDS);
 #endif
     }
 
@@ -345,7 +348,7 @@ void HX711_2::read(long *readValues, unsigned long timeout)
   {
     doubleWrite(PD_SCK, PD_SCK2, LOW);
 #if FAST_CPU
-    delayMicroseconds(1);
+    delayMicroseconds(DELAY_MICROSECONDS);
 #endif
     doubleWrite(PD_SCK, PD_SCK2, HIGH);
   }
