@@ -11,29 +11,36 @@
 #include "HX711.h"
 
 // TEENSYDUINO has a port of Dean Camera's ATOMIC_BLOCK macros for AVR to ARM Cortex M3.
-#define HAS_ATOMIC_BLOCK (defined(ARDUINO_ARCH_AVR) || defined(TEENSYDUINO))
+#if defined(ARDUINO_ARCH_AVR) || defined(TEENSYDUINO)
+#  define HAS_ATOMIC_BLOCK
+#endif
 
 // Whether we are running on either the ESP8266 or the ESP32.
-#define ARCH_ESPRESSIF (defined(ARDUINO_ARCH_ESP8266) || defined(ARDUINO_ARCH_ESP32))
+#if defined(ARDUINO_ARCH_ESP8266) || defined(ARDUINO_ARCH_ESP32)
+#  define ARCH_ESPRESSIF
+#endif
 
 // Whether we are actually running on FreeRTOS.
-#define IS_FREE_RTOS defined(ARDUINO_ARCH_ESP32)
+#if defined(ARDUINO_ARCH_ESP32)
+#  define IS_FREE_RTOS
+#endif
 
 // Define macro designating whether we're running on a reasonable
 // fast CPU and so should slow down sampling from GPIO.
-#define FAST_CPU \
-    ( \
-    ARCH_ESPRESSIF || \
+#if ( \
+    defined(ARCH_ESPRESSIF)       || \
     defined(ARDUINO_ARCH_SAM)     || defined(ARDUINO_ARCH_SAMD) || \
     defined(ARDUINO_ARCH_STM32)   || defined(TEENSYDUINO) \
     )
+#  define FAST_CPU
+#endif
 
-#if HAS_ATOMIC_BLOCK
+#if defined(HAS_ATOMIC_BLOCK)
 // Acquire AVR-specific ATOMIC_BLOCK(ATOMIC_RESTORESTATE) macro.
 #include <util/atomic.h>
 #endif
 
-#if FAST_CPU
+#if defined(FAST_CPU)
 // Make shiftIn() be aware of clockspeed for
 // faster CPUs like ESP32, Teensy 3.x and friends.
 // See also:
@@ -127,10 +134,10 @@ long HX711::read() {
 	// state after the sequence completes, insuring that the entire read-and-gain-set
 	// sequence is not interrupted.  The macro has a few minor advantages over bracketing
 	// the sequence between `noInterrupts()` and `interrupts()` calls.
-	#if HAS_ATOMIC_BLOCK
+	#if defined(HAS_ATOMIC_BLOCK)
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
 
-	#elif IS_FREE_RTOS
+	#elif defined(IS_FREE_RTOS)
 	// Begin of critical section.
 	// Critical sections are used as a valid protection method
 	// against simultaneous access in vanilla FreeRTOS.
@@ -161,11 +168,11 @@ long HX711::read() {
 		#endif
 	}
 
-	#if IS_FREE_RTOS
+	#if defined(IS_FREE_RTOS)
 	// End of critical section.
 	portEXIT_CRITICAL(&mux);
 
-	#elif HAS_ATOMIC_BLOCK
+	#elif defined(HAS_ATOMIC_BLOCK)
 	}
 
 	#else
