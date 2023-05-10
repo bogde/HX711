@@ -7,8 +7,8 @@
  * (c) 2018 Bogdan Necula
  *
 **/
-#ifndef HX711_h
-#define HX711_h
+#ifndef HX711_2_h
+#define HX711_2_h
 
 #if ARDUINO >= 100
 #include "Arduino.h"
@@ -16,27 +16,32 @@
 #include "WProgram.h"
 #endif
 
-class HX711
+class HX711_2
 {
 	private:
 		byte PD_SCK;	// Power Down and Serial Clock Input Pin
+		byte PD_SCK2;	// Power Down and Serial Clock Input Pin
 		byte DOUT;		// Serial Data Output Pin
+		byte DOUT2;		// Serial Data Output Pin
 		byte GAIN;		// amplification factor
 		long OFFSET = 0;	// used for tare weight
+		long OFFSET2 = 0;	// used for tare weight
 		float SCALE = 1.f;	// used to return weight in grams, kg, ounces, whatever
+		float SCALE2 = 1.f;	// used to return weight in grams, kg, ounces, whatever
 
 	public:
 
-		HX711();
+		HX711_2();
 
-		virtual ~HX711();
+		virtual ~HX711_2();
 
 		// Initialize library with data output pin, clock input pin and gain factor.
 		// Channel selection is made by passing the appropriate gain:
 		// - With a gain factor of 64 or 128, channel A is selected
 		// - With a gain factor of 32, channel B is selected
 		// The library default is "128" (Channel A).
-		void begin(byte dout, byte pd_sck, byte gain = 128);
+		// Clock pins can be switched in different mode passing a mode MACRO as the last param, defaults to OUTPUT.
+		void begin(byte dout, byte dout2, byte pd_sck, byte pd_sck2 = 255, byte gain = 128, unsigned char sck_mode = OUTPUT);
 
 		// Check if HX711 is ready
 		// from the datasheet: When output data is not ready for retrieval, digital output pin DOUT is high. Serial clock
@@ -54,32 +59,32 @@ class HX711
 		void set_gain(byte gain = 128);
 
 		// waits for the chip to be ready and returns a reading
-		long read(unsigned long timeout = 1000);
+		void read(long* readValues, unsigned long timeout = 1000);
 
 		// returns an average reading; times = how many times to read
-		long read_average(byte times = 10);
+		void read_average(long* readValues, byte times = 10);
 
 		// returns (read_average() - OFFSET), that is the current value without the tare weight; times = how many readings to do
-		long get_value(byte times = 1);
+		void get_value(long* readValues, byte times = 1);
 
 		// returns get_value() divided by SCALE, that is the raw value divided by a value obtained via calibration
 		// times = how many readings to do
-		float get_units(byte times = 1);
+		void get_units(float* readValues, byte times = 1);
 
 		// set the OFFSET value for tare weight; times = how many times to read the tare value
 		void tare(byte times = 10);
 
 		// set the SCALE value; this value is used to convert the raw data to "human readable" data (measure units)
-		void set_scale(float scale = 1.f);
+		void set_scale(float scale = 1.f, float scale2 = 1.f);
 
 		// get the current SCALE
-		float get_scale();
+		void get_scale(float* scaleValues);
 
 		// set OFFSET, the value that's subtracted from the actual reading (tare weight)
-		void set_offset(long offset = 0);
+		void set_offset(long offset = 0, long offset2 = 0);
 
 		// get the current OFFSET
-		long get_offset();
+		void get_offset(long* offsetValues);
 
 		// puts the chip into power down mode
 		void power_down();
@@ -88,4 +93,4 @@ class HX711
 		void power_up();
 };
 
-#endif /* HX711_h */
+#endif /* HX711_2_h */

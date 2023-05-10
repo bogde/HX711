@@ -47,11 +47,11 @@ uint8_t shiftInSlow(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder) {
     for(i = 0; i < 8; ++i) {
         digitalWrite(clockPin, HIGH);
         delayMicroseconds(1);
+        digitalWrite(clockPin, LOW);
         if(bitOrder == LSBFIRST)
             value |= digitalRead(dataPin) << i;
         else
             value |= digitalRead(dataPin) << (7 - i);
-        digitalWrite(clockPin, LOW);
         delayMicroseconds(1);
     }
     return value;
@@ -104,10 +104,12 @@ void HX711::set_gain(byte gain) {
 
 }
 
-long HX711::read() {
+long HX711::read(unsigned long timeout) {
 
 	// Wait for the chip to become ready.
-	wait_ready();
+	if (!wait_ready_timeout(timeout)) {
+        return 0;
+    }
 
 	// Define structures for reading data into.
 	unsigned long value = 0;
@@ -152,11 +154,11 @@ long HX711::read() {
 	// Set the channel and the gain factor for the next reading using the clock pin.
 	for (unsigned int i = 0; i < GAIN; i++) {
 		digitalWrite(PD_SCK, HIGH);
-		#if ARCH_ESPRESSIF
+		#if FAST_CPU
 		delayMicroseconds(1);
 		#endif
 		digitalWrite(PD_SCK, LOW);
-		#if ARCH_ESPRESSIF
+		#if FAST_CPU
 		delayMicroseconds(1);
 		#endif
 	}
@@ -218,8 +220,8 @@ bool HX711::wait_ready_retry(int retries, unsigned long delay_ms) {
 bool HX711::wait_ready_timeout(unsigned long timeout, unsigned long delay_ms) {
 	// Wait for the chip to become ready until timeout.
 	// https://github.com/bogde/HX711/pull/96
-	unsigned long millisStarted = millis();
-	while (millis() - millisStarted < timeout) {
+	unsigned long stopAt = millis() + timeout;
+	while (millis() < stopAt) {
 		if (is_ready()) {
 			return true;
 		}
@@ -239,15 +241,16 @@ long HX711::read_average(byte times) {
 	return sum / times;
 }
 
-double HX711::get_value(byte times) {
+long HX711::get_value(byte times) {
 	return read_average(times) - OFFSET;
 }
 
 float HX711::get_units(byte times) {
-	return get_value(times) / SCALE;
+	return get_value(times) / (SCALE == 0 ? 1 : SCALE);
 }
 
 void HX711::tare(byte times) {
+	set_offset(0);
 	double sum = read_average(times);
 	set_offset(sum);
 }
@@ -270,6 +273,9 @@ long HX711::get_offset() {
 
 void HX711::power_down() {
 	digitalWrite(PD_SCK, LOW);
+#if FAST_CPU
+	delayMicroseconds(1);
+#endif	
 	digitalWrite(PD_SCK, HIGH);
 }
 
