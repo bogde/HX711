@@ -38,7 +38,7 @@
 static inline void doubleWrite(uint8_t pin1, uint8_t pin2, bool level)
 {
   digitalWrite(pin1, level);
-  if (pin1 != 255)
+  if (pin2 != 255)
     digitalWrite(pin2, level);
 }
 
